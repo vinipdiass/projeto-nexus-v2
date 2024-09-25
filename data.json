@@ -44,6 +44,10 @@
       {
         "item": "Tijolo",
         "quantidade": "200"
+      },
+      {
+        "item": "pedregulho",
+        "quantidade": "b"
       }
     ]
   },
