@@ -27,8 +27,8 @@ function carregarConstrucoes() {
 // Chamar a função para carregar as construções ao iniciar
 carregarConstrucoes();
 
-// Evento de clique no botão "Posicionar Marcador"
-document.getElementById('posicionarMarcador').addEventListener('click', function() {
+// Evento de clique no botão "Posicionar Construcao"
+document.getElementById('posicionarConstrucao').addEventListener('click', function() {
     adicionarMarcador = true;
     this.disabled = true; // Desabilitar o botão enquanto o marcador não é colocado
 });
@@ -70,11 +70,11 @@ function onMapClick(e) {
 
             // Resetar a variável e habilitar o botão
             adicionarMarcador = false;
-            document.getElementById('posicionarMarcador').disabled = false;
+            document.getElementById('posicionarConstrucao').disabled = false;
         } else {
             alert('Construção não adicionada. Nome é obrigatório.');
             adicionarMarcador = false;
-            document.getElementById('posicionarMarcador').disabled = false;
+            document.getElementById('posicionarConstrucao').disabled = false;
         }
     }
 }
