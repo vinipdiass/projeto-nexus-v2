@@ -1,22 +1,66 @@
 [
-    {
-        "id": 1,
-        "nome": "Construção A",
-        "latitude": -23.55052,
-        "longitude": -46.633308,
-        "estoque": [
-            { "item": "Cimento", "quantidade": 150 },
-            { "item": "Tijolos", "quantidade": 800 }
-        ]
-    },
-    {
-        "id": 2,
-        "nome": "Construção B",
-        "latitude": -22.906847,
-        "longitude": -43.172896,
-        "estoque": [
-            { "item": "Areia", "quantidade": 300 },
-            { "item": "Brita", "quantidade": 200 }
-        ]
-    }
+  {
+    "id": 1,
+    "nome": "Construção A",
+    "latitude": -23.55052,
+    "longitude": -46.633308,
+    "estoque": [
+      {
+        "item": "Cimento",
+        "quantidade": 150
+      },
+      {
+        "item": "Tijolos",
+        "quantidade": 800
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "nome": "Construção B",
+    "latitude": -22.906847,
+    "longitude": -43.172896,
+    "estoque": [
+      {
+        "item": "Areia",
+        "quantidade": 300
+      },
+      {
+        "item": "Brita",
+        "quantidade": 200
+      }
+    ]
+  },
+  {
+    "id": 1727288523026,
+    "nome": "Construção C",
+    "latitude": -10.222271687508481,
+    "longitude": -47.127366502579115,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      },
+      {
+        "item": "Tijolo",
+        "quantidade": "200"
+      }
+    ]
+  },
+  {
+    "id": 1727288637515,
+    "nome": "gru",
+    "latitude": -17.558016762800808,
+    "longitude": -54.93949997019957,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      },
+      {
+        "item": "Penis",
+        "quantidade": "3"
+      }
+    ]
+  }
 ]
