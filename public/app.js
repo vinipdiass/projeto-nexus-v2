@@ -81,10 +81,46 @@ function onMapClick(e) {
 
 map.on('click', onMapClick);
 
+// Função para carregar construções do backend
+function carregarConstrucoes() {
+    fetch('http://localhost:3000/construcoes')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(construcao => {
+                var marker = L.marker([construcao.latitude, construcao.longitude]).addTo(map);
+                marker.bindPopup(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
+                    abrirEstoque(construcao);
+                });
+
+                // Evento para remover o marcador ao clicar com o botão direito
+                marker.on('contextmenu', function() {
+                    if (confirm('Deseja remover esta construção?')) {
+                        // Remover do mapa
+                        map.removeLayer(marker);
+
+                        // Remover do backend
+                        fetch('http://localhost:3000/construcoes/' + construcao.id, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert('Construção removida com sucesso.');
+                        })
+                        .catch(error => console.error('Erro ao remover a construção:', error));
+                    }
+                });
+            });
+        })
+        .catch(error => console.error('Erro ao carregar as construções:', error));
+}
+
+
 // Função para abrir a janela de estoque
+
 function abrirEstoque(construcao) {
-    // Abrir um modal em vez de uma nova janela
-    // Para simplificar, continuaremos com a janela popup
     var estoqueWindow = window.open('', '', 'width=400,height=500');
     estoqueWindow.document.write(`
         <!DOCTYPE html>
@@ -99,6 +135,7 @@ function abrirEstoque(construcao) {
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; }
                 button { margin-top: 20px; padding: 10px 20px; }
+                .btn-remover { background-color: red; color: white; cursor: pointer; margin-left: 10px; }
             </style>
         </head>
         <body>
@@ -107,6 +144,7 @@ function abrirEstoque(construcao) {
                 <tr>
                     <th>Item</th>
                     <th>Quantidade</th>
+                    <th>Ação</th>
                 </tr>
             </table>
             <button onclick="adicionarItem()">Adicionar Item</button>
@@ -118,12 +156,14 @@ function abrirEstoque(construcao) {
 
                 function carregarEstoque() {
                     var table = document.getElementById('estoqueTable');
-                    estoque.forEach(item => {
+                    estoque.forEach((item, index) => {
                         var row = table.insertRow();
                         var cellItem = row.insertCell(0);
                         var cellQuantidade = row.insertCell(1);
+                        var cellAcao = row.insertCell(2);
                         cellItem.innerHTML = item.item;
                         cellQuantidade.innerHTML = item.quantidade;
+                        cellAcao.innerHTML = '<button class="btn-remover" onclick="removerItem(' + index + ')">Remover Item</button>';
                     });
                 }
 
@@ -132,27 +172,43 @@ function abrirEstoque(construcao) {
                     var quantidade = prompt('Digite a quantidade:');
                     if(item && quantidade) {
                         estoque.push({ item: item, quantidade: quantidade });
-                        var table = document.getElementById('estoqueTable');
+                        atualizarEstoque();
+                    }
+                }
+
+                function removerItem(index) {
+                    if (confirm('Deseja remover este item?')) {
+                        estoque.splice(index, 1);
+                        atualizarEstoque();
+                    }
+                }
+
+                function atualizarEstoque() {
+                    var table = document.getElementById('estoqueTable');
+                    table.innerHTML = '<tr><th>Item</th><th>Quantidade</th><th>Ação</th></tr>';
+                    estoque.forEach((item, index) => {
                         var row = table.insertRow();
                         var cellItem = row.insertCell(0);
                         var cellQuantidade = row.insertCell(1);
-                        cellItem.innerHTML = item;
-                        cellQuantidade.innerHTML = quantidade;
+                        var cellAcao = row.insertCell(2);
+                        cellItem.innerHTML = item.item;
+                        cellQuantidade.innerHTML = item.quantidade;
+                        cellAcao.innerHTML = '<button class="btn-remover" onclick="removerItem(' + index + ')">Remover Item</button>';
+                    });
 
-                        // Atualizar o estoque no backend
-                        fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(estoque)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Estoque atualizado:', data);
-                        })
-                        .catch(error => console.error('Erro ao atualizar o estoque:', error));
-                    }
+                    // Atualizar o estoque no backend
+                    fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(estoque)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Estoque atualizado:', data);
+                    })
+                    .catch(error => console.error('Erro ao atualizar o estoque:', error));
                 }
 
                 // Carregar o estoque ao abrir a janela
@@ -162,3 +218,4 @@ function abrirEstoque(construcao) {
         </html>
     `);
 }
+

@@ -56,15 +56,6 @@
     "nome": "gru",
     "latitude": -17.558016762800808,
     "longitude": -54.93949997019957,
-    "estoque": [
-      {
-        "item": "Item Exemplo",
-        "quantidade": 100
-      },
-      {
-        "item": "Penis",
-        "quantidade": "3"
-      }
-    ]
+    "estoque": []
   }
 ]
