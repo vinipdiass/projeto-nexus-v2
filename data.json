@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "nome": "Construção A",
+        "latitude": -23.55052,
+        "longitude": -46.633308,
+        "estoque": [
+            { "item": "Cimento", "quantidade": 150 },
+            { "item": "Tijolos", "quantidade": 800 }
+        ]
+    },
+    {
+        "id": 2,
+        "nome": "Construção B",
+        "latitude": -22.906847,
+        "longitude": -43.172896,
+        "estoque": [
+            { "item": "Areia", "quantidade": 300 },
+            { "item": "Brita", "quantidade": 200 }
+        ]
+    }
+]
