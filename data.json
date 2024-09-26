@@ -1,55 +1,33 @@
 [
   {
-    "id": 1,
+    "id": 1727361751914,
     "nome": "Construção A",
-    "latitude": -23.55052,
-    "longitude": -46.633308,
+    "latitude": -30.038702337790692,
+    "longitude": -51.228393521043145,
     "estoque": [
       {
-        "item": "Cimento",
-        "quantidade": 150
-      },
-      {
-        "item": "Tijolos",
-        "quantidade": 800
+        "item": "Item Exemplo",
+        "quantidade": 100
       }
     ]
   },
   {
-    "id": 2,
+    "id": 1727361765560,
     "nome": "Construção B",
-    "latitude": -22.906847,
-    "longitude": -43.172896,
+    "latitude": -30.041118395649292,
+    "longitude": -51.216378807159906,
     "estoque": [
       {
-        "item": "Areia",
-        "quantidade": 300
-      },
-      {
-        "item": "Brita",
-        "quantidade": 200
+        "item": "Item Exemplo",
+        "quantidade": 100
       }
     ]
   },
   {
-    "id": 1727288523026,
+    "id": 1727361776943,
     "nome": "Construção C",
-    "latitude": -10.222271687508481,
-    "longitude": -47.127366502579115,
-    "estoque": []
-  },
-  {
-    "id": 1727300512018,
-    "nome": "G",
-    "latitude": -6.836240687123458,
-    "longitude": -52.913952811451345,
-    "estoque": []
-  },
-  {
-    "id": 1727305210588,
-    "nome": "eee",
-    "latitude": -9.147374465398991,
-    "longitude": -63.903174657069755,
+    "latitude": -30.053978265891757,
+    "longitude": -51.20054513064948,
     "estoque": [
       {
         "item": "Item Exemplo",
@@ -58,52 +36,14 @@
     ]
   },
   {
-    "id": 1727307860967,
-    "nome": "aa",
-    "latitude": -11.913699283763355,
-    "longitude": -53.71564941223163,
-    "estoque": []
-  },
-  {
-    "id": 1727307900378,
-    "nome": "aaa",
-    "latitude": -17.524478369871666,
-    "longitude": -54.506243361389934,
-    "estoque": []
-  },
-  {
-    "id": 1727307962917,
-    "nome": "aaadsasd",
-    "latitude": -16.68401767855077,
-    "longitude": -57.05371275312224,
+    "id": 1727361788615,
+    "nome": "Construção D",
+    "latitude": -30.056691262203383,
+    "longitude": -51.23058191535762,
     "estoque": [
       {
-        "item": "Item Exemplo",
-        "quantidade": 100
-      }
-    ]
-  },
-  {
-    "id": 1727307976401,
-    "nome": "kkkkkkkkkkkkkk",
-    "latitude": -26.480826425714028,
-    "longitude": -64.43258961193308,
-    "estoque": [
-      {
-        "item": "Item Exemplo",
-        "quantidade": 100
-      }
-    ]
-  },
-  {
-    "id": 1727308074553,
-    "nome": "aaaa",
-    "latitude": -23.56489837169686,
-    "longitude": -57.31724406950834,
-    "estoque": [
-      {
-        "item": "Item Exemplo",
-        "quantidade": 100
+        "item": "a",
+        "quantidade": "a"
       }
     ]
   }

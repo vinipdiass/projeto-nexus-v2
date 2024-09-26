@@ -4,12 +4,12 @@ var adicionarMarcador = false;
 // Inicializando o mapa
 var map = L.map('map').setView([-15.793889, -47.882778], 4); // Coordenadas aproximadas do Brasil
 
-//Ícone do marcador
+// Ícone do marcador
 var iconePersonalizado = L.icon({
-    iconUrl: 'assets/map-marker.png', // Coloque aqui o caminho para sua imagem
-    iconSize: [38, 38], // Tamanho do ícone [largura, altura]
-    iconAnchor: [19, 38], // Ponto de ancoragem do ícone (onde ele será "fixado" no mapa)
-    popupAnchor: [0, -38], // Ponto de ancoragem para o popup em relação ao ícone
+    iconUrl: 'assets/map-marker2.png', // Certifique-se de que o caminho para sua imagem está correto
+    iconSize: [38, 38],
+    iconAnchor: [19, 38],
+    popupAnchor: [0, -38],
 });
 
 // Adicionando o tile layer do OpenStreetMap
@@ -27,6 +27,27 @@ function carregarConstrucoes() {
                 marker.bindPopup(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
                     abrirEstoque(construcao);
                 });
+
+                // Evento para remover o marcador ao clicar com o botão direito
+                marker.on('contextmenu', function() {
+                    if (confirm('Deseja remover esta construção?')) {
+                        // Remover do mapa
+                        map.removeLayer(marker);
+
+                        // Remover do backend
+                        fetch('http://localhost:3000/construcoes/' + construcao.id, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert('Construção removida com sucesso.');
+                        })
+                        .catch(error => console.error('Erro ao remover a construção:', error));
+                    }
+                });
             });
         })
         .catch(error => console.error('Erro ao carregar as construções:', error));
@@ -35,7 +56,7 @@ function carregarConstrucoes() {
 // Chamar a função para carregar as construções ao iniciar
 carregarConstrucoes();
 
-// Evento de clique no botão "Posicionar Construcao"
+// Evento de clique no botão "Posicionar Construção"
 document.getElementById('posicionarConstrucao').addEventListener('click', function() {
     adicionarMarcador = true;
     this.disabled = true; // Desabilitar o botão enquanto o marcador não é colocado
@@ -89,141 +110,7 @@ function onMapClick(e) {
 
 map.on('click', onMapClick);
 
-// Função para carregar construções do backend
-function carregarConstrucoes() {
-    fetch('http://localhost:3000/construcoes')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(construcao => {
-                var marker = L.marker([construcao.latitude, construcao.longitude]).addTo(map);
-                marker.bindPopup(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
-                    abrirEstoque(construcao);
-                });
-
-                // Evento para remover o marcador ao clicar com o botão direito
-                marker.on('contextmenu', function() {
-                    if (confirm('Deseja remover esta construção?')) {
-                        // Remover do mapa
-                        map.removeLayer(marker);
-
-                        // Remover do backend
-                        fetch('http://localhost:3000/construcoes/' + construcao.id, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert('Construção removida com sucesso.');
-                        })
-                        .catch(error => console.error('Erro ao remover a construção:', error));
-                    }
-                });
-            });
-        })
-        .catch(error => console.error('Erro ao carregar as construções:', error));
-}
-
-
 // Função para abrir a janela de estoque
-
 function abrirEstoque(construcao) {
-    var estoqueWindow = window.open('', '', 'width=400,height=500');
-    estoqueWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-            <meta charset="UTF-8">
-            <title>Estoque da Construção</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                h2 { text-align: center; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f2f2f2; }
-                button { margin-top: 20px; padding: 10px 20px; }
-                .btn-remover { background-color: red; color: white; cursor: pointer; margin-left: 10px; }
-            </style>
-        </head>
-        <body>
-            <h2>${construcao.nome}</h2>
-            <table id="estoqueTable">
-                <tr>
-                    <th>Item</th>
-                    <th>Quantidade</th>
-                    <th>Ação</th>
-                </tr>
-            </table>
-            <button onclick="adicionarItem()">Adicionar Item</button>
-
-            <script>
-                // Dados do estoque da construção
-                var estoque = ${JSON.stringify(construcao.estoque)};
-                var construcaoId = ${construcao.id};
-
-                function carregarEstoque() {
-                    var table = document.getElementById('estoqueTable');
-                    estoque.forEach((item, index) => {
-                        var row = table.insertRow();
-                        var cellItem = row.insertCell(0);
-                        var cellQuantidade = row.insertCell(1);
-                        var cellAcao = row.insertCell(2);
-                        cellItem.innerHTML = item.item;
-                        cellQuantidade.innerHTML = item.quantidade;
-                        cellAcao.innerHTML = '<button class="btn-remover" onclick="removerItem(' + index + ')">Remover Item</button>';
-                    });
-                }
-
-                function adicionarItem() {
-                    var item = prompt('Digite o nome do item:');
-                    var quantidade = prompt('Digite a quantidade:');
-                    if(item && quantidade) {
-                        estoque.push({ item: item, quantidade: quantidade });
-                        atualizarEstoque();
-                    }
-                }
-
-                function removerItem(index) {
-                    if (confirm('Deseja remover este item?')) {
-                        estoque.splice(index, 1);
-                        atualizarEstoque();
-                    }
-                }
-
-                function atualizarEstoque() {
-                    var table = document.getElementById('estoqueTable');
-                    table.innerHTML = '<tr><th>Item</th><th>Quantidade</th><th>Ação</th></tr>';
-                    estoque.forEach((item, index) => {
-                        var row = table.insertRow();
-                        var cellItem = row.insertCell(0);
-                        var cellQuantidade = row.insertCell(1);
-                        var cellAcao = row.insertCell(2);
-                        cellItem.innerHTML = item.item;
-                        cellQuantidade.innerHTML = item.quantidade;
-                        cellAcao.innerHTML = '<button class="btn-remover" onclick="removerItem(' + index + ')">Remover Item</button>';
-                    });
-
-                    // Atualizar o estoque no backend
-                    fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(estoque)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Estoque atualizado:', data);
-                    })
-                    .catch(error => console.error('Erro ao atualizar o estoque:', error));
-                }
-
-                // Carregar o estoque ao abrir a janela
-                carregarEstoque();
-            </script>
-        </body>
-        </html>
-    `);
+    var estoqueWindow = window.open('estoque.html?id=' + construcao.id, '', 'width=400,height=500');
 }
-
