@@ -4,6 +4,14 @@ var adicionarMarcador = false;
 // Inicializando o mapa
 var map = L.map('map').setView([-15.793889, -47.882778], 4); // Coordenadas aproximadas do Brasil
 
+//Ícone do marcador
+var iconePersonalizado = L.icon({
+    iconUrl: 'assets/map-marker.png', // Coloque aqui o caminho para sua imagem
+    iconSize: [38, 38], // Tamanho do ícone [largura, altura]
+    iconAnchor: [19, 38], // Ponto de ancoragem do ícone (onde ele será "fixado" no mapa)
+    popupAnchor: [0, -38], // Ponto de ancoragem para o popup em relação ao ícone
+});
+
 // Adicionando o tile layer do OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -15,7 +23,7 @@ function carregarConstrucoes() {
         .then(response => response.json())
         .then(data => {
             data.forEach(construcao => {
-                var marker = L.marker([construcao.latitude, construcao.longitude]).addTo(map);
+                var marker = L.marker([construcao.latitude, construcao.longitude], { icon: iconePersonalizado }).addTo(map);
                 marker.bindPopup(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
                     abrirEstoque(construcao);
                 });
@@ -59,7 +67,7 @@ function onMapClick(e) {
             .then(response => response.json())
             .then(data => {
                 // Adicionar a nova construção ao mapa
-                var marker = L.marker([data.latitude, data.longitude]).addTo(map);
+                var marker = L.marker([data.latitude, data.longitude], { icon: iconePersonalizado }).addTo(map);
                 marker.bindPopup(`<b>${data.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
                     abrirEstoque(data);
                 });

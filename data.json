@@ -36,26 +36,70 @@
     "nome": "Construção C",
     "latitude": -10.222271687508481,
     "longitude": -47.127366502579115,
-    "estoque": [
-      {
-        "item": "Item Exemplo",
-        "quantidade": 100
-      },
-      {
-        "item": "Tijolo",
-        "quantidade": "200"
-      },
-      {
-        "item": "pedregulho",
-        "quantidade": "b"
-      }
-    ]
+    "estoque": []
   },
   {
     "id": 1727300512018,
     "nome": "G",
     "latitude": -6.836240687123458,
     "longitude": -52.913952811451345,
+    "estoque": []
+  },
+  {
+    "id": 1727305210588,
+    "nome": "eee",
+    "latitude": -9.147374465398991,
+    "longitude": -63.903174657069755,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
+  },
+  {
+    "id": 1727307860967,
+    "nome": "aa",
+    "latitude": -11.913699283763355,
+    "longitude": -53.71564941223163,
+    "estoque": []
+  },
+  {
+    "id": 1727307900378,
+    "nome": "aaa",
+    "latitude": -17.524478369871666,
+    "longitude": -54.506243361389934,
+    "estoque": []
+  },
+  {
+    "id": 1727307962917,
+    "nome": "aaadsasd",
+    "latitude": -16.68401767855077,
+    "longitude": -57.05371275312224,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
+  },
+  {
+    "id": 1727307976401,
+    "nome": "kkkkkkkkkkkkkk",
+    "latitude": -26.480826425714028,
+    "longitude": -64.43258961193308,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
+  },
+  {
+    "id": 1727308074553,
+    "nome": "aaaa",
+    "latitude": -23.56489837169686,
+    "longitude": -57.31724406950834,
     "estoque": [
       {
         "item": "Item Exemplo",
