@@ -1,13 +1,23 @@
-// Variável para controlar se o usuário pode adicionar um marcador
-var adicionarMarcador = false;
+// Inicializando o mapa com limites verticais ajustados
+var map = L.map('map', {
+    worldCopyJump: true,  // Ativar a repetição horizontal
+    minZoom: 3,           // Zoom mínimo para uma visão mais ampla
+    maxZoom: 18           // Zoom máximo para mais detalhes
+}).setView([-14.2350, -51.9253], 4);  // Centralizado no Brasil
 
-// Inicializando o mapa
-var map = L.map('map').setView([-15.793889, -47.882778], 4); // Coordenadas aproximadas do Brasil
+// Definindo limites máximos para restringir a movimentação vertical (norte e sul)
+map.setMaxBounds([
+    [-85, -180],   // Limite inferior esquerdo (aproximadamente perto do polo sul)
+    [85, 180]      // Limite superior direito (aproximadamente perto do polo norte)
+]);
 
 // Adicionando o tile layer do OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
+    attribution: '&copy; OpenStreetMap contributors',
+    noWrap: false,       // Permitir repetição horizontal
+    continuousWorld: true  // Habilitar repetição contínua no eixo horizontal
 }).addTo(map);
+
 
 // Função para carregar construções do backend
 function carregarConstrucoes() {
@@ -18,6 +28,27 @@ function carregarConstrucoes() {
                 var marker = L.marker([construcao.latitude, construcao.longitude]).addTo(map);
                 marker.bindPopup(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
                     abrirEstoque(construcao);
+                });
+
+                // Evento para remover o marcador ao clicar com o botão direito
+                marker.on('contextmenu', function() {
+                    if (confirm('Deseja remover esta construção?')) {
+                        // Remover do mapa
+                        map.removeLayer(marker);
+
+                        // Remover do backend
+                        fetch('http://localhost:3000/construcoes/' + construcao.id, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert('Construção removida com sucesso.');
+                        })
+                        .catch(error => console.error('Erro ao remover a construção:', error));
+                    }
                 });
             });
         })
@@ -79,47 +110,10 @@ function onMapClick(e) {
     }
 }
 
+// Evento de clique no mapa
 map.on('click', onMapClick);
 
-// Função para carregar construções do backend
-function carregarConstrucoes() {
-    fetch('http://localhost:3000/construcoes')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(construcao => {
-                var marker = L.marker([construcao.latitude, construcao.longitude]).addTo(map);
-                marker.bindPopup(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
-                    abrirEstoque(construcao);
-                });
-
-                // Evento para remover o marcador ao clicar com o botão direito
-                marker.on('contextmenu', function() {
-                    if (confirm('Deseja remover esta construção?')) {
-                        // Remover do mapa
-                        map.removeLayer(marker);
-
-                        // Remover do backend
-                        fetch('http://localhost:3000/construcoes/' + construcao.id, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert('Construção removida com sucesso.');
-                        })
-                        .catch(error => console.error('Erro ao remover a construção:', error));
-                    }
-                });
-            });
-        })
-        .catch(error => console.error('Erro ao carregar as construções:', error));
-}
-
-
 // Função para abrir a janela de estoque
-
 function abrirEstoque(construcao) {
     var estoqueWindow = window.open('', '', 'width=400,height=500');
     estoqueWindow.document.write(`
@@ -218,4 +212,3 @@ function abrirEstoque(construcao) {
         </html>
     `);
 }
-
