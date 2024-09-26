@@ -28,3 +28,18 @@ h1.titulo{
     width: 100%;
     height: 90vh;
 }
+
+/* Adicionar estilos para o botão personalizado */
+.leaflet-control .btn-posicionar-construcao {
+    width: 38px;
+    height: 38px;
+    background-color: white;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.leaflet-control .btn-posicionar-construcao:hover {
+    border-color: #888;
+}
+
