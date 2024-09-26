@@ -6,7 +6,7 @@ var map = L.map('map').setView([-15.793889, -47.882778], 4); // Coordenadas apro
 
 // Ícone do marcador
 var iconePersonalizado = L.icon({
-    iconUrl: 'assets/map-marker.png', // Certifique-se de que o caminho para sua imagem está correto
+    iconUrl: 'assets/map-marker2.png', // Certifique-se de que o caminho para sua imagem está correto
     iconSize: [38, 38],
     iconAnchor: [19, 38],
     popupAnchor: [0, -38],
@@ -17,11 +17,23 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
+// Função para alterar o cursor para o ícone do marcador
+function ativarCursorDeMarcador() {
+    // Altera o estilo do cursor do mapa
+    map.getContainer().style.cursor = `url('assets/map-cursor.png') 19 0, auto`;
+}
+
+// Função para restaurar o cursor normal
+function desativarCursorDeMarcador() {
+    // Volta o cursor ao estilo padrão
+    map.getContainer().style.cursor = '';
+}
+
 // Função para adicionar o botão personalizado ao mapa
 L.Control.PosicionarConstrucao = L.Control.extend({
     onAdd: function(map) {
         var btn = L.DomUtil.create('button', 'btn-posicionar-construcao'); // Criar um botão
-        btn.innerHTML = `<img src="assets/map-marker.png" alt="Posicionar Construção" style="width: 30px; height: 30px;" />`; // Colocar a imagem dentro do botão
+        btn.innerHTML = `<img src="assets/map-marker2.png" alt="Posicionar Construção" style="width: 30px; height: 30px;" />`; // Colocar a imagem dentro do botão
         btn.title = "Posicionar Construção";
         btn.style.background = "white"; // Definir um fundo branco para o botão
         btn.style.border = "2px solid #ccc";
@@ -35,14 +47,15 @@ L.Control.PosicionarConstrucao = L.Control.extend({
         // Adiciona o evento de clique no botão
         L.DomEvent.on(btn, 'click', function(e) {
             adicionarMarcador = true;
-            alert('Clique no mapa para posicionar a construção.');
+            ativarCursorDeMarcador(); // Ativar o cursor de marcador
+            //alert('Clique no mapa para posicionar a construção.');
         });
 
         return btn;
     },
 
     onRemove: function(map) {
-        // Nothing to do here
+        // Nada a fazer ao remover o botão
     }
 });
 
@@ -137,9 +150,11 @@ function onMapClick(e) {
             .catch(error => console.error('Erro ao adicionar a construção:', error));
 
             adicionarMarcador = false;
+            desativarCursorDeMarcador(); // Voltar para o cursor padrão
         } else {
             alert('Construção não adicionada. Nome é obrigatório.');
             adicionarMarcador = false;
+            desativarCursorDeMarcador(); // Voltar para o cursor padrão
         }
     }
 }

@@ -46,5 +46,53 @@
         "quantidade": 100
       }
     ]
+  },
+  {
+    "id": 1727363641323,
+    "nome": "aaaa",
+    "latitude": -30.045007463121323,
+    "longitude": -51.20564460754395,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
+  },
+  {
+    "id": 1727363787886,
+    "nome": "aaaaaa",
+    "latitude": -30.044003916406822,
+    "longitude": -51.208562850952156,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
+  },
+  {
+    "id": 1727364040006,
+    "nome": "aaaaa",
+    "latitude": -30.044710117006524,
+    "longitude": -51.21890544891358,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
+  },
+  {
+    "id": 1727364075850,
+    "nome": "aa",
+    "latitude": -30.046419844977734,
+    "longitude": -51.207361221313484,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
   }
 ]
