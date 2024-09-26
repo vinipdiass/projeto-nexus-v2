@@ -7,8 +7,8 @@ var map = L.map('map').setView([-15.793889, -47.882778], 4); // Coordenadas apro
 // Ícone do marcador
 var iconePersonalizado = L.icon({
     iconUrl: 'assets/map-marker2.png', // Certifique-se de que o caminho para sua imagem está correto
-    iconSize: [38, 38],
-    iconAnchor: [19, 38],
+    iconSize: [50 , 50],
+    iconAnchor: [23, 50],
     popupAnchor: [0, -38],
 });
 
@@ -48,7 +48,6 @@ L.Control.PosicionarConstrucao = L.Control.extend({
         L.DomEvent.on(btn, 'click', function(e) {
             adicionarMarcador = true;
             ativarCursorDeMarcador(); // Ativar o cursor de marcador
-            //alert('Clique no mapa para posicionar a construção.');
         });
 
         return btn;
@@ -67,14 +66,6 @@ L.control.posicionarConstrucao = function(opts) {
 // Adicionar o botão ao mapa no canto superior esquerdo
 L.control.posicionarConstrucao({ position: 'topleft' }).addTo(map);
 
-// Função para abrir o estoque da construção em uma nova página
-function abrirEstoque(construcao) {
-    // Abrir a página 'estoque.html' passando o ID da construção via query string
-    var url = `estoque.html?id=${construcao.id}`;
-    window.open(url, '_blank', 'width=400,height=500');
-}
-
-
 // Função para carregar construções do backend e ajustar o zoom
 function carregarConstrucoes() {
     fetch('http://localhost:3000/construcoes')
@@ -83,8 +74,17 @@ function carregarConstrucoes() {
             var bounds = new L.LatLngBounds();
             data.forEach(construcao => {
                 var marker = L.marker([construcao.latitude, construcao.longitude], { icon: iconePersonalizado }).addTo(map);
-                marker.bindPopup(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
-                    abrirEstoque(construcao);
+
+                // Usando bindTooltip para mostrar o nome da construção permanentemente
+                marker.bindTooltip(`<b>${construcao.nome}</b><br>Clique para ver o estoque.`, {
+                    permanent: true,      // A tooltip ficará visível permanentemente
+                    direction: 'top',     // A tooltip aparecerá acima do marcador
+                    className: 'custom-tooltip', // Adicionando uma classe customizada, se necessário
+                    offset: [0, -60]
+                });
+
+                marker.on('click', function() {
+                    abrirEstoque(construcao);  // Abrir o estoque ao clicar no marcador
                 });
 
                 // Adicionar as coordenadas do marcador ao bounds
@@ -97,7 +97,7 @@ function carregarConstrucoes() {
                         map.removeLayer(marker);
 
                         // Remover do backend
-                        fetch('http://localhost:3000/construcoes/' + construcao.id, {
+                        fetch(`http://localhost:3000/construcoes/${construcao.id}`, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -121,6 +121,13 @@ function carregarConstrucoes() {
 
 // Chamar a função para carregar as construções ao iniciar
 carregarConstrucoes();
+
+// Função para abrir o estoque da construção em uma nova página
+function abrirEstoque(construcao) {
+    // Abrir a página 'estoque.html' passando o ID da construção via query string
+    var url = `estoque.html?id=${construcao.id}`;
+    window.open(url, '_blank', 'width=400,height=500');
+}
 
 // Função para adicionar um marcador no mapa ao clicar (apenas se adicionarMarcador for true)
 function onMapClick(e) {
@@ -149,8 +156,16 @@ function onMapClick(e) {
             .then(data => {
                 // Adicionar a nova construção ao mapa
                 var marker = L.marker([data.latitude, data.longitude], { icon: iconePersonalizado }).addTo(map);
-                marker.bindPopup(`<b>${data.nome}</b><br>Clique para ver o estoque.`).on('click', function() {
-                    abrirEstoque(data);
+
+                // Mostrar o nome da construção permanentemente com a tooltip
+                marker.bindTooltip(`<b>${data.nome}</b><br>Clique para ver o estoque.`, {
+                    permanent: true,
+                    direction: 'top',
+                    className: 'custom-tooltip'
+                });
+
+                marker.on('click', function() {
+                    abrirEstoque(data);  // Abrir o estoque ao clicar no marcador
                 });
 
                 alert('Nova construção adicionada!');

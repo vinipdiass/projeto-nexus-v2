@@ -12,17 +12,22 @@
     ]
   },
   {
-    "id": 1727364040006,
-    "nome": "aaaaa",
-    "latitude": -30.044710117006524,
-    "longitude": -51.21890544891358,
-    "estoque": []
+    "id": 1727365707151,
+    "nome": "Construção B",
+    "latitude": -30.04144345780467,
+    "longitude": -51.216287612915046,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
   },
   {
-    "id": 1727364075850,
-    "nome": "aa",
-    "latitude": -30.046419844977734,
-    "longitude": -51.207361221313484,
+    "id": 1727365724995,
+    "nome": "Construção C",
+    "latitude": -30.046794261236407,
+    "longitude": -51.22916221618653,
     "estoque": [
       {
         "item": "Item Exemplo",
