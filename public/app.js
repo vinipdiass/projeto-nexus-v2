@@ -67,6 +67,14 @@ L.control.posicionarConstrucao = function(opts) {
 // Adicionar o botão ao mapa no canto superior esquerdo
 L.control.posicionarConstrucao({ position: 'topleft' }).addTo(map);
 
+// Função para abrir o estoque da construção em uma nova página
+function abrirEstoque(construcao) {
+    // Abrir a página 'estoque.html' passando o ID da construção via query string
+    var url = `estoque.html?id=${construcao.id}`;
+    window.open(url, '_blank', 'width=400,height=500');
+}
+
+
 // Função para carregar construções do backend e ajustar o zoom
 function carregarConstrucoes() {
     fetch('http://localhost:3000/construcoes')
