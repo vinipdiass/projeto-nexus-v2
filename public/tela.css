@@ -1,23 +1,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-body{
+body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
     color: #023047;
+    background-color: #e7870a; /* Laranja de fundo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
-.page{
+
+.page {
     display: flex;
     flex-direction: column;
     align-items: center;
-    align-content: center;
     justify-content: center;
     width: 100%;
     height: 100vh;
-    background-color: #e7870a;
 }
 
-.formLogin{
+/* Estilos para o logo e o texto NEXUS */
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 150px; /* Ajuste o tamanho da imagem do logo aqui */
+    height: auto;
+}
+
+.logo-text {
+    font-size: 36px;
+    color: white;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.formLogin {
     display: flex;
     flex-direction: column;
     background-color: #fff;
@@ -27,25 +49,25 @@ body{
     gap: 5px;
 }
 
-.areaLogin img{
+.areaLogin img {
     width: 420px;
 }
 
-.formLogin h1{
+.formLogin h1 {
     padding: 0;
     margin: 0;
     font-weight: 500;
     font-size: 2.3em;
 }
 
-.formLogin p{
+.formLogin p {
     display: inline-block;
     font-size: 19px;
     color: #666;
     margin-bottom: 25px;
 }
 
-.formLogin input{
+.formLogin input {
     padding: 15px;
     font-size: 14px;
     border: 1px solid #ccc;
@@ -56,12 +78,11 @@ body{
     outline: none;
 }
 
-
-.formLogin input:focus{
+.formLogin input:focus {
     border: 1px solid #e7870a;
 }
 
-.formLogin label{
+.formLogin label {
     font-size: 14px;
     font-weight: 600;
 }
@@ -74,11 +95,11 @@ body{
     transition: all linear 160ms;
 }
 
-.formLogin a:hover{
+.formLogin a:hover {
     color: #e7870a;
 }
 
-.btn{
+.btn {
     background-color: #e7870a;
     color: #fff;
     font-size: 14px;
@@ -89,7 +110,7 @@ body{
     margin: 0 !important;
 }
 
-.btn:hover{
+.btn:hover {
     transform: scale(1.05);
     background-color: #f0a500;
 }
