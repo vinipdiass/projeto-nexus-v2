@@ -34,5 +34,17 @@
         "quantidade": 100
       }
     ]
+  },
+  {
+    "id": 1727984959781,
+    "nome": "saa",
+    "latitude": -30.04373616928607,
+    "longitude": -51.2263298034668,
+    "estoque": [
+      {
+        "item": "Item Exemplo",
+        "quantidade": 100
+      }
+    ]
   }
 ]
