@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir senha</title>
+    <link rel="stylesheet" href="tela.css">
+    <link rel="icon"  href="assets/logo.ico">
+</head>
+<body>
+    <div class="page">
+        <form method="post" class="formLogin">
+            <h1>Redefinindo senha</h1>
+            <p>Preencha com os seus dados para acesso no campo abaixo</p>
+            <label for="nomeDaEmpresa">Nome da Empresa</label>
+            <input type="nomeDaEmpresa" placeholder="Digite Nome da Empresa" autofocus="true"/>
+            <label for="email">E-mail</label>
+            <input type="email" placeholder="Digite seu e-mail" autofocus="true"/>
+            <label for="password">Nova senha</label>
+            <input type="password"placeholder="Nova senha">
+            <input type="submit"value="Concluir" onclick="irParaDentro()" class="btn"/>
+            <a href="/public/telaDeLogin.html">Faça Login</a>
+            <script src="app.js"></script>
+        </form>
+    </div>
+
+</body>
+</html>
