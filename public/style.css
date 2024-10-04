@@ -1,46 +1,82 @@
-body {
+/* Estilos gerais */
+body, html {
     margin: 0;
+    padding: 0;
+    height: 100%;
     font-family: Arial, sans-serif;
 }
-
-h1 {
-    text-align: center;
-    margin-top: 20px;
-}
-
-h1.titulo{
-    font-family: 'Times New Roman', Times, serif;
-    margin: 0;
+/* Estilo da navbar */
+.navbar {
+    background-color: #e7870a;
     padding: 10px;
-    background-color: #f0a500;
+    display: flex;
+    justify-content: space-between; /* Garante que o logo e o perfil fiquem nos extremos */
+    align-items: center;
     color: white;
+    position: relative;
 }
 
+/* Estilo para centralizar o logo e o título */
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+}
 
-#posicionarConstrucao {
+.logo {
+    width: 50px;
+    height: auto;
+    margin-right: 15px;
+}
+
+.titulo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Estilos para o dropdown do perfil */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Estilos para garantir que o dropdown aparece à direita */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
     display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    font-size: 16px;
 }
 
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Mostra o dropdown quando a classe "show" é adicionada */
+.show {
+    display: block;
+}
+
+/* O mapa */
 #map {
     width: 100%;
-    height: 90vh;
+    height: calc(100vh - 60px); /* Preenche o espaço abaixo da navbar */
 }
-
-/* Adicionar estilos para o botão personalizado */
-.leaflet-control .btn-posicionar-construcao {
-    width: 38px;
-    height: 38px;
-    background-color: white;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.leaflet-control .btn-posicionar-construcao:hover {
-    border-color: #888;
-}
-
-
