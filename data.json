@@ -32,6 +32,10 @@
       {
         "item": "Item Exemplo",
         "quantidade": 100
+      },
+      {
+        "item": "Tijolo ",
+        "quantidade": "100"
       }
     ]
   }

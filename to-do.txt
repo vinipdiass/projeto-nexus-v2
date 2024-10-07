@@ -2,8 +2,8 @@ Controle de Estoque
 Implementar um banco de dados
 Implementar a interface
 Mapa
-Validar valores
 Colocar no public só o necessário
 
 Baixa prioridade:
+Mudar o popup de campo para uma caixa vermelha abaixo
 Mudar o simbolo dos markers pins
