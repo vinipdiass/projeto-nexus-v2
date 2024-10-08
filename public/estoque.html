@@ -11,9 +11,19 @@
         th { background-color: #f2f2f2; }
         button { margin-top: 20px; padding: 10px 20px; }
         .btn-remover { background-color: red; color: white; cursor: pointer; margin-left: 10px; }
-        #videoContainer { margin-top: 20px; display: flex; justify-content: center; }
+        #videoContainer { margin-top: 20px; display: flex; justify-content: left;}
         #videoFeed { border: 2px solid #333; }
-        #detectionsContainer { margin-left: 20px; }
+        #detectionsContainer {
+            margin-left: 20px;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 250px;
+        }
+        #detections {
+            white-space: pre-wrap; /* Preserve quebras de linha */
+        }
     </style>
 </head>
 <body>
@@ -71,6 +81,39 @@
             });
         }
 
+        function adicionarItem() {
+            var item = prompt('Digite o nome do item:');
+            var quantidade = prompt('Digite a quantidade:');
+            if (item && quantidade) {
+                estoque.push({ item: item, quantidade: quantidade });
+                atualizarEstoque();
+            }
+        }
+
+        function removerItem(index) {
+            if (confirm('Deseja remover este item?')) {
+                estoque.splice(index, 1);
+                atualizarEstoque();
+            }
+        }
+
+        function atualizarEstoque() {
+            // Atualizar o estoque no backend
+            fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(estoque)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Estoque atualizado:', data);
+                carregarEstoque();
+            })
+            .catch(error => console.error('Erro ao atualizar o estoque:', error));
+        }
+
         function abrirCamera() {
             const videoContainer = document.getElementById('videoContainer');
             const videoFeed = document.getElementById('videoFeed');
@@ -90,7 +133,7 @@
                 fetch('http://localhost:5000/detections')
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('detections').innerText = data.detections || "Nenhuma detecção ainda...";
+                        document.getElementById('detections').innerText = data.detections ? data.detections.split(', ').join('\n') : "Nenhuma detecção ainda...";
                     })
                     .catch(error => console.error('Erro ao obter detecções:', error));
             }, 1000); // Atualiza a cada segundo
