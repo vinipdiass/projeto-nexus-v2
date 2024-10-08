@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const PORT = process.env.PORT || 3000;
+
 
 dotenv.config();
 
@@ -207,6 +209,6 @@ app.post('/login', async (req, res) => {
 
 
 // Iniciando o servidor
-app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
+app.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
