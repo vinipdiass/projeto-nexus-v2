@@ -34,25 +34,92 @@ function desativarCursorDeMarcador() {
   map.getContainer().style.cursor = "";
 }
 
-// Função para adicionar o botão personalizado ao mapa
+// Função para adicionar uma construção com base em um endereço
+function adicionarConstrucaoPorEndereco() {
+  var endereco = prompt("Digite o endereço da construção:");
+  if (endereco) {
+    // Fazendo a requisição à API Nominatim para obter as coordenadas
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(endereco)}&format=json`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.length > 0) {
+          // Pegando as coordenadas do primeiro resultado
+          var latitude = parseFloat(data[0].lat);
+          var longitude = parseFloat(data[0].lon);
+
+          var nomeConstrucao = prompt("Digite o nome da construção:");
+          if (nomeConstrucao) {
+            var novaConstrucao = {
+              id: Date.now(),
+              nome: nomeConstrucao,
+              latitude: latitude,
+              longitude: longitude,
+              estoque: [{ item: "Item Exemplo", quantidade: 100 }],
+            };
+
+            // Enviar a nova construção para o backend
+            fetch("http://localhost:3000/construcoes", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(novaConstrucao),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                // Adicionar a nova construção ao mapa
+                var marker = L.marker([data.latitude, data.longitude], {
+                  icon: iconePersonalizado,
+                }).addTo(map);
+
+                // Mostrar o nome da construção permanentemente com a tooltip
+                marker.bindTooltip(
+                  `<b>${data.nome}</b><br>Clique para ver o estoque.`,
+                  {
+                    permanent: true,
+                    direction: "top",
+                    className: "custom-tooltip",
+                  }
+                );
+
+                marker.on("click", function () {
+                  abrirEstoque(data); // Abrir o estoque ao clicar no marcador
+                });
+
+                alert("Nova construção adicionada!");
+              })
+              .catch((error) =>
+                console.error("Erro ao adicionar a construção:", error)
+              );
+          } else {
+            alert("Construção não adicionada. Nome é obrigatório.");
+          }
+        } else {
+          alert("Endereço não encontrado. Tente novamente.");
+        }
+      })
+      .catch((error) => console.error("Erro ao buscar coordenadas:", error));
+  } else {
+    alert("Endereço é obrigatório.");
+  }
+}
+
+// Adicionar evento ao botão para ativar a função adicionar construção por endereço
 L.Control.PosicionarConstrucao = L.Control.extend({
   onAdd: function (map) {
-    var btn = L.DomUtil.create("button", "btn-posicionar-construcao"); // Criar um botão
-    btn.innerHTML = `<img src="assets/map-marker2.png" alt="Posicionar Construção" style="width: 30px; height: 30px;" />`; // Colocar a imagem dentro do botão
+    var btn = L.DomUtil.create("button", "btn-posicionar-construcao");
+    btn.innerHTML = `<img src="assets/map-marker2.png" alt="Posicionar Construção" style="width: 30px; height: 30px;" />`;
     btn.title = "Posicionar Construção";
-    btn.style.background = "white"; // Definir um fundo branco para o botão
+    btn.style.background = "white";
     btn.style.border = "2px solid #ccc";
     btn.style.borderRadius = "5px";
     btn.style.cursor = "pointer";
-    btn.style.padding = "5px"; // Adicionar padding ao redor da imagem
+    btn.style.padding = "5px";
 
-    // Evitar a propagação do clique para o mapa
     L.DomEvent.disableClickPropagation(btn);
 
-    // Adiciona o evento de clique no botão
     L.DomEvent.on(btn, "click", function (e) {
-      adicionarMarcador = true;
-      ativarCursorDeMarcador(); // Ativar o cursor de marcador
+      adicionarConstrucaoPorEndereco(); // Chama a função que solicita o endereço e adiciona a construção
     });
 
     return btn;
@@ -62,6 +129,9 @@ L.Control.PosicionarConstrucao = L.Control.extend({
     // Nada a fazer ao remover o botão
   },
 });
+
+
+
 
 // Adiciona o controle ao mapa, posicionando-o como os botões de zoom
 L.control.posicionarConstrucao = function (opts) {
