@@ -11,14 +11,9 @@
         th { background-color: #f2f2f2; }
         button { margin-top: 20px; padding: 10px 20px; }
         .btn-remover { background-color: red; color: white; cursor: pointer; margin-left: 10px; }
-        /* Estilo para o vídeo */
-        #videoContainer {
-            margin-top: 20px;
-            text-align: center;
-        }
-        #videoFeed {
-            border: 2px solid #333;
-        }
+        #videoContainer { margin-top: 20px; display: flex; justify-content: center; }
+        #videoFeed { border: 2px solid #333; }
+        #detectionsContainer { margin-left: 20px; }
     </style>
 </head>
 <body>
@@ -31,29 +26,29 @@
         </tr>
     </table>
     <button onclick="adicionarItem()">Adicionar Item</button>
-    <!-- Botão para abrir a câmera -->
     <button onclick="abrirCamera()">Abrir Câmera</button>
 
-    <!-- Container para o vídeo -->
     <div id="videoContainer" style="display: none;">
-        <h2>Câmera</h2>
-        <img id="videoFeed" src="" width="600" />
+        <div>
+            <h2>Câmera</h2>
+            <img id="videoFeed" src="" width="600" />
+        </div>
+        <div id="detectionsContainer">
+            <h3>Detecções</h3>
+            <p id="detections">Nenhuma detecção ainda...</p>
+        </div>
     </div>
 
     <script>
-        // Obter o ID da construção a partir dos parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
         const construcaoId = urlParams.get('id');
-
         let construcao = null;
         let estoque = [];
-        
+
         function carregarConstrucao() {
-            console.log('Carregando construção com ID:', construcaoId);
             fetch('http://localhost:3000/construcoes/' + construcaoId)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Dados da construção recebidos:', data);
                     construcao = data;
                     estoque = construcao.estoque || [];
                     document.getElementById('construcaoNome').innerText = construcao.nome;
@@ -64,7 +59,6 @@
 
         function carregarEstoque() {
             var table = document.getElementById('estoqueTable');
-            // Limpar a tabela, mantendo o cabeçalho
             table.innerHTML = '<tr><th>Item</th><th>Quantidade</th><th>Ação</th></tr>';
             estoque.forEach((item, index) => {
                 var row = table.insertRow();
@@ -77,59 +71,31 @@
             });
         }
 
-        function adicionarItem() {
-            var item = prompt('Digite o nome do item:');
-            var quantidade = prompt('Digite a quantidade:');
-            if(item && quantidade) {
-                estoque.push({ item: item, quantidade: quantidade });
-                atualizarEstoque();
-            }
-        }
-
-        function removerItem(index) {
-            if (confirm('Deseja remover este item?')) {
-                estoque.splice(index, 1);
-                atualizarEstoque();
-            }
-        }
-
-        function atualizarEstoque() {
-            // Atualizar o estoque no backend
-            fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(estoque)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Estoque atualizado:', data);
-                carregarEstoque();
-            })
-            .catch(error => console.error('Erro ao atualizar o estoque:', error));
-        }
-
-        // Função para abrir a câmera
         function abrirCamera() {
             const videoContainer = document.getElementById('videoContainer');
             const videoFeed = document.getElementById('videoFeed');
 
-            // Verifica se o vídeo já está sendo exibido
             if (videoContainer.style.display === 'none') {
-                // Define a fonte do vídeo (ajuste a URL se necessário)
                 videoFeed.src = 'http://localhost:5000/video_feed';
-
-                // Exibe o container do vídeo
-                videoContainer.style.display = 'block';
+                videoContainer.style.display = 'flex';
+                atualizarDetecoes();
             } else {
-                // Se já estiver exibindo, oculta o vídeo
                 videoFeed.src = '';
                 videoContainer.style.display = 'none';
             }
         }
 
-        // Carregar a construção ao abrir a janela
+        function atualizarDetecoes() {
+            setInterval(() => {
+                fetch('http://localhost:5000/detections')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('detections').innerText = data.detections || "Nenhuma detecção ainda...";
+                    })
+                    .catch(error => console.error('Erro ao obter detecções:', error));
+            }, 1000); // Atualiza a cada segundo
+        }
+
         carregarConstrucao();
     </script>
 </body>
