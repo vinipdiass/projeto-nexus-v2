@@ -11,6 +11,14 @@
         th { background-color: #f2f2f2; }
         button { margin-top: 20px; padding: 10px 20px; }
         .btn-remover { background-color: red; color: white; cursor: pointer; margin-left: 10px; }
+        /* Estilo para o vídeo */
+        #videoContainer {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #videoFeed {
+            border: 2px solid #333;
+        }
     </style>
 </head>
 <body>
@@ -23,6 +31,14 @@
         </tr>
     </table>
     <button onclick="adicionarItem()">Adicionar Item</button>
+    <!-- Botão para abrir a câmera -->
+    <button onclick="abrirCamera()">Abrir Câmera</button>
+
+    <!-- Container para o vídeo -->
+    <div id="videoContainer" style="display: none;">
+        <h2>Câmera</h2>
+        <img id="videoFeed" src="" width="800" />
+    </div>
 
     <script>
         // Obter o ID da construção a partir dos parâmetros da URL
@@ -33,19 +49,18 @@
         let estoque = [];
         
         function carregarConstrucao() {
-    console.log('Carregando construção com ID:', construcaoId);
-    fetch('http://localhost:3000/construcoes/' + construcaoId)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Dados da construção recebidos:', data);
-            construcao = data;
-            estoque = construcao.estoque || [];
-            document.getElementById('construcaoNome').innerText = construcao.nome;
-            carregarEstoque();
-        })
-        .catch(error => console.error('Erro ao carregar a construção:', error));
-}
-
+            console.log('Carregando construção com ID:', construcaoId);
+            fetch('http://localhost:3000/construcoes/' + construcaoId)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Dados da construção recebidos:', data);
+                    construcao = data;
+                    estoque = construcao.estoque || [];
+                    document.getElementById('construcaoNome').innerText = construcao.nome;
+                    carregarEstoque();
+                })
+                .catch(error => console.error('Erro ao carregar a construção:', error));
+        }
 
         function carregarEstoque() {
             var table = document.getElementById('estoqueTable');
@@ -79,22 +94,40 @@
         }
 
         function atualizarEstoque() {
-    // Atualizar o estoque no backend
-    fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(estoque)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Estoque atualizado:', data);
-        carregarEstoque();
-    })
-    .catch(error => console.error('Erro ao atualizar o estoque:', error));
-}
+            // Atualizar o estoque no backend
+            fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(estoque)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Estoque atualizado:', data);
+                carregarEstoque();
+            })
+            .catch(error => console.error('Erro ao atualizar o estoque:', error));
+        }
 
+        // Função para abrir a câmera
+        function abrirCamera() {
+            const videoContainer = document.getElementById('videoContainer');
+            const videoFeed = document.getElementById('videoFeed');
+
+            // Verifica se o vídeo já está sendo exibido
+            if (videoContainer.style.display === 'none') {
+                // Define a fonte do vídeo (ajuste a URL se necessário)
+                videoFeed.src = 'http://localhost:5000/video_feed';
+
+                // Exibe o container do vídeo
+                videoContainer.style.display = 'block';
+            } else {
+                // Se já estiver exibindo, oculta o vídeo
+                videoFeed.src = '';
+                videoContainer.style.display = 'none';
+            }
+        }
 
         // Carregar a construção ao abrir a janela
         carregarConstrucao();

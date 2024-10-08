@@ -3,8 +3,10 @@ from ultralytics import YOLO
 import cv2
 import os
 from flask import Flask, render_template, Response
+from flask_cors import CORS  # Importa o CORS
 
 app = Flask(__name__)
+CORS(app)  # Habilita o CORS
 
 # Carrega o modelo
 model = YOLO("yolov8n.pt")
