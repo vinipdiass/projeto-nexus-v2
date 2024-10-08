@@ -114,7 +114,7 @@ function adicionarConstrucaoPorEndereco() {
               nome: nomeConstrucao,
               latitude: latitude,
               longitude: longitude,
-              estoque: [{ item: "Item Exemplo", quantidade: 100 }],
+              estoque: [{ item: "Tijolo", quantidade: 100 }],
             };
 
             // Enviar a nova construção para o backend
