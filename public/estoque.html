@@ -114,30 +114,6 @@
             .catch(error => console.error('Erro ao atualizar o estoque:', error));
         }
 
-        function abrirCamera() {
-            const videoContainer = document.getElementById('videoContainer');
-            const videoFeed = document.getElementById('videoFeed');
-
-            if (videoContainer.style.display === 'none') {
-                videoFeed.src = 'http://localhost:5000/video_feed';
-                videoContainer.style.display = 'flex';
-                atualizarDetecoes();
-            } else {
-                videoFeed.src = '';
-                videoContainer.style.display = 'none';
-            }
-        }
-
-        function atualizarDetecoes() {
-            setInterval(() => {
-                fetch('http://localhost:5000/detections')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('detections').innerText = data.detections ? data.detections.split(', ').join('\n') : "Nenhuma detecção ainda...";
-                    })
-                    .catch(error => console.error('Erro ao obter detecções:', error));
-            }, 1000); // Atualiza a cada segundo
-        }
 
         carregarConstrucao();
     </script>

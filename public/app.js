@@ -75,23 +75,6 @@ function adicionarConstrucaoPorEndereco() {
     var numero = inputNumero.value.trim();
     var nomeConstrucao = inputNome.value.trim();
 
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('/run-camera')
-          .then(response => {
-              if (response.ok) {
-                  return response.text();
-              } else {
-                  throw new Error('Erro ao chamar o script Python');
-              }
-          })
-          .then(data => {
-              console.log(data);
-          })
-          .catch(error => {
-              console.error('Erro:', error);
-          });
-  });
-
     // Verificar se todos os campos foram preenchidos
     if (cidade && bairro && rua && numero && nomeConstrucao) {
       // Fechar o modal
