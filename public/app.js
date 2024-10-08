@@ -75,6 +75,23 @@ function adicionarConstrucaoPorEndereco() {
     var numero = inputNumero.value.trim();
     var nomeConstrucao = inputNome.value.trim();
 
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('/run-camera')
+          .then(response => {
+              if (response.ok) {
+                  return response.text();
+              } else {
+                  throw new Error('Erro ao chamar o script Python');
+              }
+          })
+          .then(data => {
+              console.log(data);
+          })
+          .catch(error => {
+              console.error('Erro:', error);
+          });
+  });
+
     // Verificar se todos os campos foram preenchidos
     if (cidade && bairro && rua && numero && nomeConstrucao) {
       // Fechar o modal
@@ -271,7 +288,7 @@ carregarConstrucoes();
 function abrirEstoque(construcao) {
   // Abrir a página 'estoque.html' passando o ID da construção via query string
   var url = `estoque.html?id=${construcao.id}`;
-  window.open(url, "_blank", "width=400,height=500");
+  window.open(url, "_blank");
 }
 
 // Função para adicionar um marcador no mapa ao clicar (apenas se adicionarMarcador for true)

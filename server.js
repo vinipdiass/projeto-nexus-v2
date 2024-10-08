@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-
+const { exec } = require('child_process');
 // Configurações
 app.use(cors());
 app.use(bodyParser.json());
@@ -22,6 +22,23 @@ mongoose.connect(process.env.MONGO_URI, {
 }).catch((err) => {
     console.error('Erro ao conectar ao MongoDB:', err);
 });
+
+function runCameraScript() {
+    exec('python camera/camera.py', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Erro ao executar o script: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Erro: ${stderr}`);
+            return;
+        }
+        console.log(`Saída do script Python: ${stdout}`);
+    });
+}
+
+// Executa o script Python assim que o servidor é iniciado
+runCameraScript();
 
 // Definindo o modelo de construção
 const construcaoSchema = new mongoose.Schema({

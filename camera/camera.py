@@ -14,7 +14,7 @@ model = YOLO("yolov8n.pt")
 # Define o mapeamento de classe personalizada
 class_mapping = {
     # ... (seu mapeamento de classes aqui)
-    0: 'abrigado',
+    0: 'pessoa',
     1: 'bicicleta',
     # Continue com o restante das classes...
     79: 'escova de dentes'
