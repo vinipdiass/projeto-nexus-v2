@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 
@@ -23,6 +25,15 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error('Erro ao conectar ao MongoDB:', err);
 });
 
+const userSchema = new mongoose.Schema({
+    nomeDaEmpresa: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    senha: { type: String, required: true },
+});
+
+const User = mongoose.model('User', userSchema);
+
+
 function runCameraScript() {
     exec('python camera/camera.py', (error, stdout, stderr) => {
         if (error) {
@@ -40,6 +51,20 @@ function runCameraScript() {
 // Executa o script Python assim que o servidor é iniciado
 runCameraScript();
 
+function authenticateToken(req, res, next) {
+    const token = req.header('auth-token');
+    if (!token) return res.status(401).json({ error: 'Acesso negado' });
+    try {
+        const verified = jwt.verify(token, process.env.TOKEN_SECRET || 'secretkey');
+        req.user = verified;
+        next();
+    } catch (error) {
+        res.status(400).json({ error: 'Token inválido' });
+    }
+}
+
+
+
 // Definindo o modelo de construção
 const construcaoSchema = new mongoose.Schema({
     id: Number,
@@ -52,19 +77,21 @@ const construcaoSchema = new mongoose.Schema({
             quantidade: Number,
         },
     ],
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 const Construcao = mongoose.model('Construcao', construcaoSchema);
 
 // Endpoint para obter todas as construções
-app.get('/construcoes', async (req, res) => {
+app.get('/construcoes', authenticateToken, async (req, res) => {
     try {
-        const construcoes = await Construcao.find();
+        const construcoes = await Construcao.find({ userId: req.user._id });
         res.send(construcoes);
     } catch (error) {
         res.status(500).send('Erro ao obter as construções.');
     }
 });
+
 
 // Endpoint para obter uma construção por ID
 app.get('/construcoes/:id', async (req, res) => {
@@ -82,8 +109,9 @@ app.get('/construcoes/:id', async (req, res) => {
 });
 
 // Endpoint para adicionar uma nova construção
-app.post('/construcoes', async (req, res) => {
+app.post('/construcoes', authenticateToken, async (req, res) => {
     const novaConstrucao = req.body;
+    novaConstrucao.userId = req.user._id; // Associa a construção ao usuário logado
     try {
         const construcao = new Construcao(novaConstrucao);
         await construcao.save();
@@ -127,6 +155,56 @@ app.delete('/construcoes/:id', async (req, res) => {
         res.status(500).send('Erro ao remover a construção.');
     }
 });
+
+app.post('/register', async (req, res) => {
+    const { nomeDaEmpresa, email, senha } = req.body;
+    try {
+        // Verificar se o email já está em uso
+        const emailExistente = await User.findOne({ email });
+        if (emailExistente) {
+            return res.status(400).json({ error: 'E-mail já cadastrado.' });
+        }
+
+        // Hash da senha
+        const hashedPassword = await bcrypt.hash(senha, 10);
+
+        // Criar novo usuário
+        const user = new User({
+            nomeDaEmpresa,
+            email,
+            senha: hashedPassword,
+        });
+        await user.save();
+        res.status(201).json({ message: 'Usuário registrado com sucesso' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao registrar usuário' });
+    }
+});
+
+app.post('/login', async (req, res) => {
+    const { email, senha } = req.body;
+    try {
+        // Encontrar usuário pelo email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ error: 'E-mail ou senha incorretos' });
+        }
+
+        // Comparar a senha
+        const validPassword = await bcrypt.compare(senha, user.senha);
+        if (!validPassword) {
+            return res.status(400).json({ error: 'E-mail ou senha incorretos' });
+        }
+
+        // Criar e atribuir um token
+        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET || 'secretkey', { expiresIn: '1h' });
+        res.header('auth-token', token).json({ message: 'Logado com sucesso', token });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao fazer login' });
+    }
+});
+
+
 
 // Iniciando o servidor
 app.listen(3000, () => {

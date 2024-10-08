@@ -4,30 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar-se</title>
-    <link rel="stylesheet" href="tela.css">
-    <link rel="icon"  href="assets/logo.ico">
+    <link rel="stylesheet" href="tela.css"> <!-- Importa o CSS -->
+    <link rel="icon" href="assets/logo.png">
 </head>
 <body>
     <div class="page">
-                        <!-- Seção do logo e texto NEXUS -->
-                        <div class="logo-container">
-                            <img src="assets/logo_nexus.png" alt="Logo da Empresa" class="logo">
-                            <h1 class="logo-text">NEXUS</h1>
-                        </div>
-        <form method="post" class="formLogin">
+        <!-- Seção do logo e texto NEXUS -->
+        <div class="logo-container">
+            <img src="assets/logo_nexus.png" alt="Logo da Empresa" class="logo">
+            <h1 class="logo-text">NEXUS</h1>
+        </div>
+        <form id="registerForm" class="formLogin">
             <h1>Registre-se</h1>
             <p>Registre-se com os seus dados para acesso no campo abaixo</p>
             <label for="nomeDaEmpresa">Nome da Empresa</label>
-            <input type="nomeDaEmpresa" placeholder="Digite Nome da Empresa" autofocus="true"/>
+            <input type="text" id="nomeDaEmpresa" name="nomeDaEmpresa" placeholder="Digite Nome da Empresa" autofocus="true"/>
             <label for="email">E-mail</label>
-            <input type="email" placeholder="Digite seu e-mail" autofocus="true"/>
+            <input type="email" id="email" name="email" placeholder="Digite seu e-mail"/>
             <label for="password">Senha</label>
-            <input type="password"placeholder="Digite sua senha">
-            <input type="submit"value="Concluir" onclick="irParaDentro()" class="btn"/>
+            <input type="password" id="password" name="senha" placeholder="Digite sua senha">
+            <input type="submit" value="Concluir" class="btn"/>
             <a href="index.html">Faça Login</a>
-            <script src="app.js"></script>
         </form>
     </div>
-
+    <script src="register.js"></script>
 </body>
 </html>

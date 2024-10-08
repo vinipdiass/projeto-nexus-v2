@@ -122,6 +122,7 @@ function adicionarConstrucaoPorEndereco() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                "auth-token": localStorage.getItem('token'),
               },
               body: JSON.stringify(novaConstrucao),
             })
@@ -223,7 +224,16 @@ L.control.posicionarConstrucao({ position: "topleft" }).addTo(map);
 
 // Função para carregar construções do backend e ajustar o zoom
 function carregarConstrucoes() {
-  fetch("http://localhost:3000/construcoes")
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Você precisa estar logado para acessar esta página.');
+    window.location.href = 'index.html';
+  }
+  fetch("http://localhost:3000/construcoes", {
+    headers: {
+        'auth-token': token
+    }
+  })
     .then((response) => response.json())
     .then((data) => {
       var bounds = new L.LatLngBounds();
