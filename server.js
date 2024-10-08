@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 
 dotenv.config();
