@@ -80,3 +80,90 @@ body, html {
     width: 100%;
     height: calc(100vh - 60px); /* Preenche o espaço abaixo da navbar */
 }
+
+/* Estilos para o modal */
+/* Estilos para o modal */
+.modal {
+    display: none; /* Oculto por padrão */
+    position: fixed; /* Fixa na tela */
+    z-index: 1000; /* Sobre outros elementos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+    overflow: auto; /* Habilita scroll se necessário */
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+  }
+  
+  /* Conteúdo do modal */
+  .modal-content {
+    background-color: #ffffff;
+    margin: 5% auto; /* Centraliza o modal */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px; /* Largura máxima */
+    border-radius: 10px; /* Bordas arredondadas */
+    position: relative; /* Necessário para o botão fechar */
+    display: flex; /* Transforma o conteúdo em um contêiner flexível */
+    flex-direction: column; /* Organiza os elementos em coluna */
+    gap: 8px; /* Espaçamento de 3px entre todos os elementos */
+    font-size: 14px;
+  }
+  
+  /* Botão fechar */
+  .fechar {
+    color: #aaa;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .fechar:hover,
+  .fechar:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Estilos para cada campo */
+  .modal-content label {
+    display: block;
+    font-weight: bold; /* Texto em negrito */
+  }
+  
+  /* Estilos para os inputs */
+  .modal-content input[type="text"] {
+    width: 100%;
+    height: 40px; /* Altura dos inputs */
+    padding: 8px; /* Padding interno */
+    box-sizing: border-box; /* Inclui padding e borda no tamanho total */
+    border: 2px solid #ccc; /* Borda visível */
+    border-radius: 5px; /* Cantos arredondados */
+    font-size: 12px; /* Tamanho da fonte */
+    outline: none; /* Remove o outline padrão ao focar */
+  }
+  
+  /* Estilos para os botões */
+  .modal-content button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  #adicionar-construcao {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  #cancelar-construcao {
+    background-color: #f44336;
+    color: white;
+  }
+  

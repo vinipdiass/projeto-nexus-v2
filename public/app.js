@@ -36,19 +36,62 @@ function desativarCursorDeMarcador() {
 
 // Função para adicionar uma construção com base em um endereço
 function adicionarConstrucaoPorEndereco() {
-  var endereco = prompt("Digite o endereço da construção:");
-  if (endereco) {
-    // Fazendo a requisição à API Nominatim para obter as coordenadas
-    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(endereco)}&format=json`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.length > 0) {
-          // Pegando as coordenadas do primeiro resultado
-          var latitude = parseFloat(data[0].lat);
-          var longitude = parseFloat(data[0].lon);
+  // Obter referências aos elementos do modal
+  var modal = document.getElementById("modal-construcao");
+  var spanFechar = document.getElementById("fechar-modal-construcao");
+  var btnAdicionar = document.getElementById("adicionar-construcao");
+  var btnCancelar = document.getElementById("cancelar-construcao");
+  var inputCidade = document.getElementById("cidade-input");
+  var inputBairro = document.getElementById("bairro-input");
+  var inputRua = document.getElementById("rua-input");
+  var inputNumero = document.getElementById("numero-input");
+  var inputNome = document.getElementById("nome-input");
 
-          var nomeConstrucao = prompt("Digite o nome da construção:");
-          if (nomeConstrucao) {
+  // Limpar os campos de entrada
+  inputCidade.value = "";
+  inputBairro.value = "";
+  inputRua.value = "";
+  inputNumero.value = "";
+  inputNome.value = "";
+
+  // Exibir o modal
+  modal.style.display = "block";
+
+  // Função para fechar o modal
+  function fecharModal() {
+    modal.style.display = "none";
+    // Remover event listeners para evitar duplicação
+    btnAdicionar.removeEventListener("click", onAdicionarClick);
+    btnCancelar.removeEventListener("click", onCancelarClick);
+    spanFechar.removeEventListener("click", onFecharClick);
+    window.removeEventListener("click", onWindowClick);
+  }
+
+  // Handlers dos eventos
+  function onAdicionarClick() {
+    var cidade = inputCidade.value.trim();
+    var bairro = inputBairro.value.trim();
+    var rua = inputRua.value.trim();
+    var numero = inputNumero.value.trim();
+    var nomeConstrucao = inputNome.value.trim();
+
+    // Verificar se todos os campos foram preenchidos
+    if (cidade && bairro && rua && numero && nomeConstrucao) {
+      // Fechar o modal
+      fecharModal();
+
+      // Concatenar os campos em uma única string de endereço
+      var endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
+
+      // Fazer a requisição à API Nominatim para obter as coordenadas
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(endereco)}&format=json`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.length > 0) {
+            // Pegando as coordenadas do primeiro resultado
+            var latitude = parseFloat(data[0].lat);
+            var longitude = parseFloat(data[0].lon);
+
             var novaConstrucao = {
               id: Date.now(),
               nome: nomeConstrucao,
@@ -92,17 +135,37 @@ function adicionarConstrucaoPorEndereco() {
                 console.error("Erro ao adicionar a construção:", error)
               );
           } else {
-            alert("Construção não adicionada. Nome é obrigatório.");
+            alert("Endereço não encontrado. Tente novamente.");
           }
-        } else {
-          alert("Endereço não encontrado. Tente novamente.");
-        }
-      })
-      .catch((error) => console.error("Erro ao buscar coordenadas:", error));
-  } else {
-    alert("Endereço é obrigatório.");
+        })
+        .catch((error) => console.error("Erro ao buscar coordenadas:", error));
+    } else {
+      alert("Por favor, preencha todos os campos.");
+    }
   }
+
+  function onCancelarClick() {
+    fecharModal();
+  }
+
+  function onFecharClick() {
+    fecharModal();
+  }
+
+  function onWindowClick(event) {
+    if (event.target == modal) {
+      fecharModal();
+    }
+  }
+
+  // Adicionar event listeners
+  btnAdicionar.addEventListener("click", onAdicionarClick);
+  btnCancelar.addEventListener("click", onCancelarClick);
+  spanFechar.addEventListener("click", onFecharClick);
+  window.addEventListener("click", onWindowClick);
 }
+
+
 
 // Adicionar evento ao botão para ativar a função adicionar construção por endereço
 L.Control.PosicionarConstrucao = L.Control.extend({
