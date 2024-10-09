@@ -40,7 +40,9 @@ body, html {
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    margin-right: 15px;
     cursor: pointer;
+    border: 0.5px solid rgb(255, 255, 255);
 }
 
 /* Estilos para garantir que o dropdown aparece à direita */

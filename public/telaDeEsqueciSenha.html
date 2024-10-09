@@ -3,31 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redefinir senha</title>
+    <title>Recuperar Senha - Nexus</title>
     <link rel="stylesheet" href="tela.css">
-    <link rel="icon"  href="assets/logo.png">
 </head>
 <body>
     <div class="page">
-                        <!-- Seção do logo e texto NEXUS -->
-                        <div class="logo-container">
-                            <img src="assets/logo_nexus.png" alt="Logo da Empresa" class="logo">
-                            <h1 class="logo-text">NEXUS</h1>
-                        </div>
-        <form method="post" class="formLogin">
-            <h1>Redefinindo senha</h1>
-            <p>Preencha com os seus dados para acesso no campo abaixo</p>
-            <label for="nomeDaEmpresa">Nome da Empresa</label>
-            <input type="nomeDaEmpresa" placeholder="Digite Nome da Empresa" autofocus="true"/>
+        <h1>Recuperar Senha</h1>
+        <p>Insira seu e-mail para receber um link de recuperação de senha.</p>
+        <form id="esqueciSenhaForm">
             <label for="email">E-mail</label>
-            <input type="email" placeholder="Digite seu e-mail" autofocus="true"/>
-            <label for="password">Nova senha</label>
-            <input type="password"placeholder="Nova senha">
-            <input type="submit"value="Concluir" onclick="irParaDentro()" class="btn"/>
-            <a href="index.html">Faça Login</a>
-            <script src="app.js"></script>
+            <input type="email" id="email" placeholder="Digite seu e-mail" required />
+            <input type="submit" value="Enviar" class="btn"/>
         </form>
+        <a href="index.html">Voltar para o login</a>
     </div>
-
+    <script src="esqueciSenha.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const PORT = process.env.PORT || 3000;
+const nodemailer = require('nodemailer');
 
 
 dotenv.config();
@@ -94,6 +95,14 @@ app.get('/construcoes', authenticateToken, async (req, res) => {
     }
 });
 
+// Configure o nodemailer para enviar e-mails
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Ou outro serviço de email que você use
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
 // Endpoint para obter uma construção por ID
 app.get('/construcoes/:id', async (req, res) => {
@@ -109,6 +118,60 @@ app.get('/construcoes/:id', async (req, res) => {
         res.status(500).send('Erro ao obter a construção.');
     }
 });
+
+// Endpoint para solicitar recuperação de senha
+app.post('/esqueci-senha', async (req, res) => {
+    const { email } = req.body;
+    try {
+        // Check if the email exists
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: 'E-mail não encontrado' });
+        }
+
+        // Generate a password reset token (e.g., using JWT or another method)
+        const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET || 'secretkey', { expiresIn: '1h' });
+
+        // Send the reset email
+        const resetLink = `http://localhost:3000/telaDeRedefinirSenha.html?token=${token}`;
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Recuperação de Senha - Nexus',
+            html: `<p>Clique no link abaixo para redefinir sua senha:</p><a href="${resetLink}">Redefinir Senha</a>`
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.json({ message: 'E-mail de recuperação enviado!' });
+    } catch (error) {
+        console.error('Erro ao enviar e-mail:', error);
+        res.status(500).json({ error: 'Erro ao enviar e-mail de recuperação' });
+    }
+});
+
+
+app.post('/redefinir-senha', async (req, res) => {
+    const { token, novaSenha } = req.body;
+    try {
+        // Verifica o token e recupera o ID do usuário
+        const decoded = jwt.verify(token, process.env.TOKEN_SECRET || 'secretkey');
+        const user = await User.findById(decoded._id);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        // Atualiza a senha do usuário
+        const hashedPassword = await bcrypt.hash(novaSenha, 10);
+        user.senha = hashedPassword;
+        await user.save();
+
+        res.json({ message: 'Senha redefinida com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao redefinir senha:', error);
+        res.status(400).json({ error: 'Token inválido ou expirado' });
+    }
+});
+
 
 // Endpoint para adicionar uma nova construção
 app.post('/construcoes', authenticateToken, async (req, res) => {
