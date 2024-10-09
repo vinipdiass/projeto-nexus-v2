@@ -28,6 +28,15 @@ function ativarCursorDeMarcador() {
   map.getContainer().style.cursor = `url('assets/map-cursor.png') 19 0, auto`;
 }
 
+function logout() {
+  // Remove o token do localStorage
+  localStorage.removeItem('token');
+  
+  // Redireciona para a página de login
+  window.location.href = 'index.html';
+}
+
+
 // Função para restaurar o cursor normal
 function desativarCursorDeMarcador() {
   // Volta o cursor ao estilo padrão
