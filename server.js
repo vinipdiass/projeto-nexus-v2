@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const PORT = process.env.PORT || 3000;
 const nodemailer = require('nodemailer');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 
 dotenv.config();
@@ -32,6 +34,10 @@ const userSchema = new mongoose.Schema({
     nomeDaEmpresa: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     senha: { type: String, required: true },
+    imagem: { 
+        data: Buffer, 
+        contentType: String 
+    }
 });
 
 const User = mongoose.model('User', userSchema);
@@ -55,7 +61,7 @@ function runCameraScript() {
 runCameraScript();
 
 function authenticateToken(req, res, next) {
-    const token = req.header('auth-token');
+    const token = req.header('token');
     if (!token) return res.status(401).json({ error: 'Acesso negado' });
     try {
         const verified = jwt.verify(token, process.env.TOKEN_SECRET || 'secretkey');
@@ -94,6 +100,23 @@ app.get('/construcoes', authenticateToken, async (req, res) => {
         res.status(500).send('Erro ao obter as construções.');
     }
 });
+
+app.get('/getUserImage', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (!user || !user.imagem || !user.imagem.data) {
+            return res.status(404).json({ error: 'Nenhuma imagem encontrada para o usuário' });
+        }
+
+        res.set('Content-Type', user.imagem.contentType);
+        res.send(user.imagem.data);
+    } catch (error) {
+        console.error('Erro ao carregar a imagem do usuário:', error);
+        res.status(500).json({ error: 'Erro ao carregar imagem' });
+    }
+});
+
 
 // Configure o nodemailer para enviar e-mails
 const transporter = nodemailer.createTransport({
@@ -146,6 +169,28 @@ app.post('/esqueci-senha', async (req, res) => {
     } catch (error) {
         console.error('Erro ao enviar e-mail:', error);
         res.status(500).json({ error: 'Erro ao enviar e-mail de recuperação' });
+    }
+});
+
+app.post('/upload', authenticateToken, upload.single('imagem'), async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        // Atualiza a imagem do usuário
+        user.imagem = {
+            data: req.file.buffer,
+            contentType: req.file.mimetype
+        };
+
+        await user.save();
+        res.status(200).json({ message: 'Imagem atualizada com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao salvar a imagem:', error);
+        res.status(500).json({ error: 'Erro ao salvar imagem' });
     }
 });
 
@@ -263,11 +308,14 @@ app.post('/login', async (req, res) => {
 
         // Criar e atribuir um token
         const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET || 'secretkey', { expiresIn: '1h' });
-        res.header('auth-token', token).json({ message: 'Logado com sucesso', token });
+
+        // Retornar o token e uma mensagem de sucesso no formato JSON
+        res.json({ message: 'Logado com sucesso', token });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao fazer login' });
     }
 });
+
 
 
 
