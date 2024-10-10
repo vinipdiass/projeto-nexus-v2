@@ -56,7 +56,7 @@
         let estoque = [];
 
         function carregarConstrucao() {
-            fetch('http://localhost:3000/construcoes/' + construcaoId)
+            fetch('/construcoes/' + construcaoId)
                 .then(response => response.json())
                 .then(data => {
                     construcao = data;
@@ -99,7 +99,7 @@
 
         function atualizarEstoque() {
             // Atualizar o estoque no backend
-            fetch('http://localhost:3000/construcoes/' + construcaoId + '/estoque', {
+            fetch('/construcoes/' + construcaoId + '/estoque', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
