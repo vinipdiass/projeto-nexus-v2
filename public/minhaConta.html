@@ -8,21 +8,26 @@
 </head>
 <body>
     <div class="container">
-        <h1>Perfil do Usuário</h1>
-        <div class="profile-info">
+        <h1 class="titulo">Perfil do Usuário</h1>
+        <div class="bloco">
             <p><strong>Email:</strong> <span id="userEmail"></span></p>
             <p><strong>Nome da Empresa:</strong> <span id="companyName"></span></p>
+            <button class="btn" id="requestPasswordReset">Redefinir Senha</button>
         </div>
-        <h2>Atualizar Imagem de Perfil</h2>
-        <form id="uploadForm" enctype="multipart/form-data">
-            <input type="file" id="imageInput" accept="image/*" required />
-            <button type="submit" class="btn">Enviar Imagem</button>
-        </form>
-        <div class="image-preview">
-            <h3>Imagem Atual</h3>
-            <img id="userImage" src="assets/perfil-vazio.jpg" alt="Imagem do usuário" />
+        
+        <div class="bloco">
+            <h1>Atualizar Imagem de Perfil</h1>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="imageInput" accept="image/*" required />
+                <button type="submit" class="btn">Enviar Imagem</button>
+            </form>
+            <div class="image-preview">
+                <h3>Imagem Atual</h3>
+                <img id="userImage" src="assets/perfil-vazio.jpg" alt="Imagem do usuário" />
+            </div>
         </div>
-        <button class="btn" id="requestPasswordReset">Redefinir Senha</button>
+
+        
     </div>
 
     <script>
