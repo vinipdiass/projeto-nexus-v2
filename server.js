@@ -17,7 +17,8 @@ const app = express();
 const { exec } = require('child_process');
 // Configurações
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // Conectando ao MongoDB
