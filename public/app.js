@@ -22,6 +22,42 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
+document.addEventListener('DOMContentLoaded', () => {
+  const authToken = localStorage.getItem('token'); // Recuperando o token
+  console.log('Token encontrado:', authToken);
+
+  if (!authToken) {
+      alert('Token de autenticação não encontrado. Faça login novamente.');
+      window.location.href = '/login.html';
+      return;
+  }
+
+
+  // Agora fazemos a requisição para obter a imagem do usuário
+  fetch('/getUserImage', {
+      method: 'GET',
+      headers: {
+          'token': authToken // Usando o token recuperado
+      }
+  })
+  .then(response => {
+      if (response.ok) {
+          console.log('Imagem encontrada.'); // Verificação adicional
+          return response.blob(); // Obtendo a imagem como um Blob
+      } else {          
+          throw new Error('Erro ao carregar a imagem do usuário.');
+      }
+  })
+  .then(blob => {
+      const imageUrl = URL.createObjectURL(blob);
+      const avatarImg = document.getElementById('userAvatar');
+      avatarImg.src = imageUrl; // Atualizando a imagem do avatar
+      console.log('Imagem carregada com sucesso.');
+  })
+  .catch(error => {
+      console.error('Erro ao carregar a imagem do usuário:', error);
+  });
+});
 // Função para alterar o cursor para o ícone do marcador
 function ativarCursorDeMarcador() {
   // Altera o estilo do cursor do mapa
@@ -66,6 +102,56 @@ function adicionarConstrucaoPorEndereco() {
   // Exibir o modal
   modal.style.display = "block";
 
+  document.addEventListener('DOMContentLoaded', () => {
+    const authToken = localStorage.getItem('token'); // Recuperando o token
+    console.log('Token encontrado:', authToken);
+
+    if (!authToken) {
+        alert('Token de autenticação não encontrado. Faça login novamente.');
+        window.location.href = '/login.html';
+        return;
+    }
+
+    fetch('/run-camera')
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error('Erro ao chamar o script Python');
+            }
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+
+    // Agora fazemos a requisição para obter a imagem do usuário
+    fetch('/getUserImage', {
+        method: 'GET',
+        headers: {
+            'token': authToken // Usando o token recuperado
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Imagem encontrada.'); // Verificação adicional
+            return response.blob(); // Obtendo a imagem como um Blob
+        } else {          
+            throw new Error('Erro ao carregar a imagem do usuário.');
+        }
+    })
+    .then(blob => {
+        const imageUrl = URL.createObjectURL(blob);
+        const avatarImg = document.getElementById('userAvatar');
+        avatarImg.src = imageUrl; // Atualizando a imagem do avatar
+        console.log('Imagem carregada com sucesso.');
+    })
+    .catch(error => {
+        console.error('Erro ao carregar a imagem do usuário:', error);
+    });
+});
   // Função para fechar o modal
   function fecharModal() {
     modal.style.display = "none";
@@ -76,6 +162,56 @@ function adicionarConstrucaoPorEndereco() {
     window.removeEventListener("click", onWindowClick);
   }
 
+  document.addEventListener('DOMContentLoaded', () => {
+    const authToken = localStorage.getItem('token'); // Recuperando o token
+    console.log('Token encontrado:', authToken);
+
+    if (!authToken) {
+        alert('Token de autenticação não encontrado. Faça login novamente.');
+        window.location.href = '/login.html';
+        return;
+    }
+
+    fetch('/run-camera')
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error('Erro ao chamar o script Python');
+            }
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+
+    // Agora fazemos a requisição para obter a imagem do usuário
+    fetch('/getUserImage', {
+        method: 'GET',
+        headers: {
+            'token': authToken // Usando o token recuperado
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Imagem encontrada.'); // Verificação adicional
+            return response.blob(); // Obtendo a imagem como um Blob
+        } else {          
+            throw new Error('Erro ao carregar a imagem do usuário.');
+        }
+    })
+    .then(blob => {
+        const imageUrl = URL.createObjectURL(blob);
+        const avatarImg = document.getElementById('userAvatar');
+        avatarImg.src = imageUrl; // Atualizando a imagem do avatar
+        console.log('Imagem carregada com sucesso.');
+    })
+    .catch(error => {
+        console.error('Erro ao carregar a imagem do usuário:', error);
+    });
+});
   // Handlers dos eventos
   function onAdicionarClick() {
     var cidade = inputCidade.value.trim();
@@ -83,23 +219,8 @@ function adicionarConstrucaoPorEndereco() {
     var rua = inputRua.value.trim();
     var numero = inputNumero.value.trim();
     var nomeConstrucao = inputNome.value.trim();
-
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('/run-camera')
-          .then(response => {
-              if (response.ok) {
-                  return response.text();
-              } else {
-                  throw new Error('Erro ao chamar o script Python');
-              }
-          })
-          .then(data => {
-              console.log(data);
-          })
-          .catch(error => {
-              console.error('Erro:', error);
-          });
-  });
+  
+  
 
     // Verificar se todos os campos foram preenchidos
     if (cidade && bairro && rua && numero && nomeConstrucao) {
@@ -131,7 +252,7 @@ function adicionarConstrucaoPorEndereco() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "auth-token": localStorage.getItem('token'),
+                "token": localStorage.getItem('token'),
               },
               body: JSON.stringify(novaConstrucao),
             })
@@ -240,7 +361,7 @@ function carregarConstrucoes() {
   }
   fetch("http://localhost:3000/construcoes", {
     headers: {
-        'auth-token': token
+        'token': token
     }
   })
     .then((response) => response.json())

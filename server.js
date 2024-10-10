@@ -102,20 +102,25 @@ app.get('/construcoes', authenticateToken, async (req, res) => {
 });
 
 app.get('/getUserImage', authenticateToken, async (req, res) => {
+    console.log('Requisição para imagem recebida:', req.user);
     try {
         const user = await User.findById(req.user._id);
-
         if (!user || !user.imagem || !user.imagem.data) {
+            console.log('Imagem não encontrada para o usuário.');
             return res.status(404).json({ error: 'Nenhuma imagem encontrada para o usuário' });
         }
 
+        console.log('Imagem encontrada. Enviando...');
         res.set('Content-Type', user.imagem.contentType);
         res.send(user.imagem.data);
+        console.log('Imagem enviada.');
     } catch (error) {
         console.error('Erro ao carregar a imagem do usuário:', error);
         res.status(500).json({ error: 'Erro ao carregar imagem' });
     }
 });
+
+
 
 
 // Configure o nodemailer para enviar e-mails

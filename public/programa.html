@@ -19,7 +19,7 @@
 
         <!-- Perfil movido para a extrema direita -->
         <div class="dropdown">
-            <img src="assets/perfil-vazio.jpg" alt="Ícone de Perfil" class="avatar">
+            <img src="assets/perfil-vazio.jpg" alt="Ícone de Perfil" class="avatar" id="userAvatar">
             <div id="profileDropdown" class="dropdown-content">
                 <a href="minhaConta.html">Minha Conta</a>
                 <a href="#">Configurações</a>
@@ -30,12 +30,6 @@
 
     <!-- O mapa será renderizado aqui -->
     <div id="map"></div>
-
-    <!-- Incluindo o Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Incluindo o arquivo JavaScript externo -->
-    <script src="dropdown.js"></script> <!-- Script separado -->
-    <script src="app.js"></script> <!-- Script da aplicação do mapa -->
 
     <!-- Modal para adicionar construção -->
 <!-- Modal para adicionar construção -->
@@ -70,6 +64,10 @@
   </div>
   
   
-  
+    <!-- Incluindo o Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Incluindo o arquivo JavaScript externo -->
+    <script src="dropdown.js"></script> <!-- Script separado -->
+    <script src="app.js"></script> <!-- Script da aplicação do mapa -->
 </body>
 </html>
