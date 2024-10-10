@@ -13,4 +13,4 @@ RUN npm install
 RUN pip install -r requirements.txt
 
 # Define the entry point for the container
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
