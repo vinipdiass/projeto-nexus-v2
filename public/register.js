@@ -5,7 +5,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
     const senha = document.getElementById('password').value;
 
     // Envia uma requisição POST para /register
-    fetch('http://localhost:3000/register', {
+    fetch('/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nomeDaEmpresa, email, senha })

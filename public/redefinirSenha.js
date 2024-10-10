@@ -10,7 +10,7 @@ document.getElementById('redefinirSenhaForm').addEventListener('submit', functio
         return;
     }
 
-    fetch('http://localhost:3000/redefinir-senha', {
+    fetch('/redefinir-senha', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, novaSenha })

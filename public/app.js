@@ -248,7 +248,7 @@ function adicionarConstrucaoPorEndereco() {
             };
 
             // Enviar a nova construção para o backend
-            fetch("http://localhost:3000/construcoes", {
+            fetch("/construcoes", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -359,7 +359,7 @@ function carregarConstrucoes() {
     alert('Você precisa estar logado para acessar esta página.');
     window.location.href = 'index.html';
   }
-  fetch("http://localhost:3000/construcoes", {
+  fetch("/construcoes", {
     headers: {
         'token': token
     }
@@ -397,7 +397,7 @@ function carregarConstrucoes() {
             map.removeLayer(marker);
 
             // Remover do backend
-            fetch(`http://localhost:3000/construcoes/${construcao.id}`, {
+            fetch(`/construcoes/${construcao.id}`, {
               method: "DELETE",
               headers: {
                 "Content-Type": "application/json",
@@ -445,7 +445,7 @@ function onMapClick(e) {
       };
 
       // Enviar a nova construção para o backend
-      fetch("http://localhost:3000/construcoes", {
+      fetch("/construcoes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

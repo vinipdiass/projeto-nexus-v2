@@ -6,7 +6,7 @@ document.getElementById('esqueciSenhaForm').addEventListener('submit', function(
     const email = document.getElementById('email').value;
 
     // Make a POST request to the backend endpoint
-    fetch('http://localhost:3000/esqueci-senha', {
+    fetch('/esqueci-senha', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
