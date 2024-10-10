@@ -3,64 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload de Imagem - Nexus</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            font-size: 20px;
-            color: #333;
-        }
-
-        input[type="file"] {
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        .image-preview {
-            margin-top: 20px;
-        }
-
-        img {
-            max-width: 100%;
-            border-radius: 8px;
-        }
-    </style>
+    <title>Perfil do Usuário - Nexus</title>
+    <link rel="stylesheet" href="minhaConta.css">
 </head>
 <body>
     <div class="container">
-        <h1>Upload de Imagem do Usuário</h1>
+        <h1>Perfil do Usuário</h1>
+        <div class="profile-info">
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>Nome da Empresa:</strong> <span id="companyName"></span></p>
+        </div>
+        <h2>Atualizar Imagem de Perfil</h2>
         <form id="uploadForm" enctype="multipart/form-data">
             <input type="file" id="imageInput" accept="image/*" required />
             <button type="submit" class="btn">Enviar Imagem</button>
@@ -69,81 +22,99 @@
             <h3>Imagem Atual</h3>
             <img id="userImage" src="assets/perfil-vazio.jpg" alt="Imagem do usuário" />
         </div>
+        <button class="btn" id="requestPasswordReset">Redefinir Senha</button>
     </div>
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const authToken = localStorage.getItem('token'); // Recuperando o token
-    console.log('Token encontrado:', authToken); // Verifique se o token está sendo recuperado
+        document.addEventListener('DOMContentLoaded', async () => {
+            const authToken = localStorage.getItem('token');
+            if (!authToken) {
+                alert('Token de autenticação não encontrado. Faça login novamente.');
+                window.location.href = '/login.html';
+                return;
+            }
 
-    if (!authToken) {
-        alert('Token de autenticação não encontrado. Faça login novamente.');
-        window.location.href = '/login.html';
-    }
-});
+            try {
+                // Carregar os dados do perfil do usuário
+                const profileResponse = await fetch('/getUserProfile', {
+                    method: 'GET',
+                    headers: { 'token': authToken }
+                });
 
-document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const fileInput = document.getElementById('imageInput');
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('imagem', file);
+                if (profileResponse.ok) {
+                    const userProfile = await profileResponse.json();
+                    document.getElementById('userEmail').textContent = userProfile.email;
+                    document.getElementById('companyName').textContent = userProfile.nomeDaEmpresa;
+                } else {
+                    throw new Error('Erro ao carregar informações do perfil.');
+                }
 
-    try {
-        const token = localStorage.getItem('token'); // Padronizando o uso do token
-        if (!token) {
-            alert('Token de autenticação não encontrado. Faça login novamente.');
-            return;
-        }
-        const response = await fetch('/upload', {
-            method: 'POST',
-            headers: {
-                'token': token // Padronizando o nome do token
-            },
-            body: formData
-        });
+                // Carregar a imagem do usuário
+                const imageResponse = await fetch('/getUserImage', {
+                    method: 'GET',
+                    headers: { 'token': authToken }
+                });
 
-        if (response.ok) {
-            alert('Imagem enviada com sucesso!');
-            const imageUrl = URL.createObjectURL(file);
-            document.getElementById('userImage').src = imageUrl;
-        } else {
-            alert('Erro ao enviar a imagem.');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao enviar a imagem.');
-    }
-});
-
-// Fetch para carregar a imagem atual do usuário ao carregar a página
-async function loadUserImage() {
-    try {
-        const token = localStorage.getItem('token'); // Padronizando o uso do token
-        const response = await fetch('/getUserImage', {
-            method: 'GET',
-            headers: {
-                'token': token // Padronizando o nome do token
+                if (imageResponse.ok) {
+                    const imageBlob = await imageResponse.blob();
+                    const imageUrl = URL.createObjectURL(imageBlob);
+                    document.getElementById('userImage').src = imageUrl;
+                } else {
+                    console.log('Nenhuma imagem encontrada para o usuário.');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar os dados do usuário:', error);
             }
         });
 
-        if (response.ok) {
-            const imageBlob = await response.blob();
-            const imageUrl = URL.createObjectURL(imageBlob);
-            document.getElementById('userImage').src = imageUrl;
-        } else {
-            console.log('Nenhuma imagem encontrada para o usuário.');
-        }
-    } catch (error) {
-        console.error('Erro ao carregar a imagem do usuário:', error);
-    }
-}
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('imagem', file);
 
-// Carregar a imagem do usuário ao iniciar a página
-window.onload = loadUserImage;
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    headers: { 'token': token },
+                    body: formData
+                });
 
+                if (response.ok) {
+                    alert('Imagem enviada com sucesso!');
+                    const imageUrl = URL.createObjectURL(file);
+                    document.getElementById('userImage').src = imageUrl;
+                } else {
+                    alert('Erro ao enviar a imagem.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao enviar a imagem.');
+            }
+        });
 
+        document.getElementById('requestPasswordReset').addEventListener('click', async () => {
+            const email = document.getElementById('userEmail').textContent;
+            try {
+                const response = await fetch('/esqueci-senha', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert('Erro ao solicitar recuperação de senha.');
+                }
+            } catch (error) {
+                console.error('Erro ao solicitar recuperação de senha:', error);
+                alert('Erro ao solicitar recuperação de senha.');
+            }
+        });
     </script>
 </body>
 </html>

@@ -120,6 +120,23 @@ app.get('/getUserImage', authenticateToken, async (req, res) => {
     }
 });
 
+app.get('/getUserProfile', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        res.json({
+            email: user.email,
+            nomeDaEmpresa: user.nomeDaEmpresa
+        });
+    } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        res.status(500).json({ error: 'Erro ao carregar perfil' });
+    }
+});
+
 
 
 
