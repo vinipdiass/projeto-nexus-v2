@@ -38,5 +38,25 @@
         "quantidade": "100"
       }
     ]
+  },
+  {
+    "id": 1727365724978,
+    "nome": "Construção D",
+    "latitude": -29.046794261236407,
+    "longitude": -52.22916221618653,
+    "estoque": [
+      {
+        "item": "Por que",
+        "quantidade": 100
+      },
+      {
+        "item": "o Repositório",
+        "quantidade": 100
+      },
+      {
+        "item": "é publico?",
+        "quantidade": 100
+      }
+    ]
   }
 ]
