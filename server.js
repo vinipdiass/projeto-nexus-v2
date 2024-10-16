@@ -241,6 +241,24 @@ app.post('/upload', authenticateToken, upload.single('imagem'), async (req, res)
     }
 });
 
+app.post('/updateDetections', authenticateToken, async (req, res) => {
+    try {
+        const { detections } = req.body;
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        user.detections = detections; // Substituir as detecções
+        await user.save();
+
+        res.json({ message: 'Detecções atualizadas com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao atualizar detecções:', error);
+        res.status(500).json({ error: 'Erro ao atualizar detecções' });
+    }
+});
+
 
 app.post('/redefinir-senha', async (req, res) => {
     const { token, novaSenha } = req.body;
