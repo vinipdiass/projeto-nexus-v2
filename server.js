@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
+const crypto = require('crypto'); // Adicione isso no topo do seu server.js
 
 
 dotenv.config();
@@ -38,8 +39,10 @@ const userSchema = new mongoose.Schema({
     imagem: { 
         data: Buffer, 
         contentType: String 
-    }
+    },
+    chave: { type: String, required: true } // Adicionando o campo 'chave'
 });
+
 
 const User = mongoose.model('User', userSchema);
 
@@ -130,13 +133,15 @@ app.get('/getUserProfile', authenticateToken, async (req, res) => {
 
         res.json({
             email: user.email,
-            nomeDaEmpresa: user.nomeDaEmpresa
+            nomeDaEmpresa: user.nomeDaEmpresa,
+            chave: user.chave // Incluindo a chave
         });
     } catch (error) {
         console.error('Erro ao carregar perfil:', error);
         res.status(500).json({ error: 'Erro ao carregar perfil' });
     }
 });
+
 
 
 
@@ -194,6 +199,25 @@ app.post('/esqueci-senha', async (req, res) => {
         res.status(500).json({ error: 'Erro ao enviar e-mail de recuperação' });
     }
 });
+
+app.post('/generateNewKey', authenticateToken, async (req, res) => {
+    try {
+        const novaChave = crypto.randomBytes(16).toString('hex'); // Gera uma nova chave
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            { chave: novaChave },
+            { new: true }
+        );
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+        res.json({ message: 'Nova chave gerada com sucesso!', chave: user.chave });
+    } catch (error) {
+        console.error('Erro ao gerar nova chave:', error);
+        res.status(500).json({ error: 'Erro ao gerar nova chave' });
+    }
+});
+
 
 app.post('/upload', authenticateToken, upload.single('imagem'), async (req, res) => {
     try {
@@ -289,6 +313,7 @@ app.delete('/construcoes/:id', async (req, res) => {
     }
 });
 
+
 app.post('/register', async (req, res) => {
     const { nomeDaEmpresa, email, senha } = req.body;
     try {
@@ -301,11 +326,15 @@ app.post('/register', async (req, res) => {
         // Hash da senha
         const hashedPassword = await bcrypt.hash(senha, 10);
 
-        // Criar novo usuário
+        // Gerar chave aleatória
+        const chave = crypto.randomBytes(16).toString('hex'); // Gera uma chave de 32 caracteres hexadecimais
+
+        // Criar novo usuário com a chave
         const user = new User({
             nomeDaEmpresa,
             email,
             senha: hashedPassword,
+            chave: chave
         });
         await user.save();
         res.status(201).json({ message: 'Usuário registrado com sucesso' });
@@ -313,6 +342,7 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Erro ao registrar usuário' });
     }
 });
+
 
 app.post('/login', async (req, res) => {
     const { email, senha } = req.body;

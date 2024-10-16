@@ -60,6 +60,7 @@ input[type="file"] {
     font-size: 10px;
     transition: background-color 0.3s;
     width: 100%;
+    margin-bottom: 10px;
 }
 
 a, a:hover{

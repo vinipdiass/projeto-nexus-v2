@@ -428,7 +428,7 @@ carregarConstrucoes();
 function abrirEstoque(construcao) {
   // Abrir a página 'estoque.html' passando o ID da construção via query string
   var url = `estoque.html?id=${construcao.id}`;
-  window.open(url, "_blank");
+  window.open(url);
 }
 
 // Função para adicionar um marcador no mapa ao clicar (apenas se adicionarMarcador for true)

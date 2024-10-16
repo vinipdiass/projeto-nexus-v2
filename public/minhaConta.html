@@ -12,8 +12,11 @@
         <div class="bloco">
             <p><strong>Email:</strong> <span id="userEmail"></span></p>
             <p><strong>Nome da Empresa:</strong> <span id="companyName"></span></p>
+            <p><strong>Sua Chave:</strong> <span id="userKey"></span></p>
+            <button class="btn" id="generateNewKey">Gerar Nova Chave</button>
             <button class="btn" id="requestPasswordReset">Redefinir Senha</button>
         </div>
+        
         
         <div class="bloco">
             <h1>Atualizar Imagem de Perfil</h1>
@@ -49,6 +52,7 @@
                     const userProfile = await profileResponse.json();
                     document.getElementById('userEmail').textContent = userProfile.email;
                     document.getElementById('companyName').textContent = userProfile.nomeDaEmpresa;
+                    document.getElementById('userKey').textContent = userProfile.chave; // Exibe a chave
                 } else {
                     throw new Error('Erro ao carregar informações do perfil.');
                 }
@@ -70,6 +74,28 @@
                 console.error('Erro ao carregar os dados do usuário:', error);
             }
         });
+
+        document.getElementById('generateNewKey').addEventListener('click', async () => {
+            const authToken = localStorage.getItem('token');
+            try {
+                const response = await fetch('/generateNewKey', {
+                    method: 'POST',
+                    headers: { 'token': authToken }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('userKey').textContent = data.chave; // Atualiza a chave exibida
+                    alert('Nova chave gerada com sucesso!');
+                } else {
+                    throw new Error('Erro ao gerar nova chave.');
+                }
+            } catch (error) {
+                console.error('Erro ao gerar nova chave:', error);
+                alert('Erro ao gerar nova chave.');
+            }
+        });
+
 
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
