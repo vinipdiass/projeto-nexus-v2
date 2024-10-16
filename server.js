@@ -40,9 +40,39 @@ const userSchema = new mongoose.Schema({
         data: Buffer, 
         contentType: String 
     },
-    chave: { type: String, required: true } // Adicionando o campo 'chave'
+    chave: { type: String, required: true }, // Adicionando o campo 'chave'
+    detections: { type: [String], default: [] }
 });
 
+app.post('/deteccoes', async (req, res) => {
+    console.log('Requisição recebida em /deteccoes');
+    const key = req.header('Authorization');
+    console.log('Chave recebida:', key);
+    if (!key) return res.status(401).json({ error: 'Acesso negado: chave ausente' });
+
+    try {
+        // Procura o usuário pela chave
+        const user = await User.findOne({ chave: key });
+        if (!user) {
+            return res.status(401).json({ error: 'Chave inválida' });
+        }
+
+        const { detections } = req.body;
+
+        if (!detections || !Array.isArray(detections)) {
+            return res.status(400).json({ error: 'Formato de detecções inválido' });
+        }
+
+        // Atualiza as detecções do usuário
+        user.detections.push(...detections);
+        await user.save();
+
+        res.status(200).json({ message: 'Detecções atualizadas com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao atualizar detecções:', error);
+        res.status(500).json({ error: 'Erro ao atualizar detecções' });
+    }
+});
 
 const User = mongoose.model('User', userSchema);
 
