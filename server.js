@@ -135,6 +135,22 @@ app.get('/construcoes', authenticateToken, async (req, res) => {
     }
 });
 
+app.get('/getUserDetections', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        res.json({
+            detections: user.detections
+        });
+    } catch (error) {
+        console.error('Erro ao carregar detecções:', error);
+        res.status(500).json({ error: 'Erro ao carregar detecções' });
+    }
+});
+
 app.get('/getUserImage', authenticateToken, async (req, res) => {
     console.log('Requisição para imagem recebida:', req.user);
     try {
