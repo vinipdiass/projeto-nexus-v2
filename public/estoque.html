@@ -44,6 +44,8 @@
         <h3>Detecções</h3>
         <p id="detections">Carregando detecções...</p>
     </div>
+
+    <button onclick="adicionarDeteccoes()">Adicionar Detecções</button>
     
 
     <script>
@@ -88,6 +90,64 @@
             }
         }
 
+        function adicionarDeteccoes() {
+            console.log("Função adicionarDeteccoes chamada");
+
+            const detectionsText = document.getElementById('detections').innerText;
+            console.log("Detecções encontradas:", detectionsText);
+            
+            const detectionsArray = detectionsText.split('\n').filter(item => item.trim() !== '');
+
+            if (detectionsArray.length === 0) {
+                alert("Detecções enviadas.");
+                return;
+            }
+
+            // Regex para detectar a quantidade e o nome do item no formato "<quantidade> <item>(s)"
+            const regex = /^(\d+)\s+(.+)\(s\)$/;
+
+            detectionsArray.forEach(detection => {
+                const match = detection.match(regex);
+                console.log("Processando detecção:", detection);
+
+                if (match) {
+                    const quantidade = parseInt(match[1]); // Quantidade
+                    const item = match[2].trim(); // Nome do item
+
+                    if (item && quantidade) {
+                        // Adicionar o item ao estoque
+                        estoque.push({ item: item, quantidade: quantidade });
+                        console.log("Adicionado ao estoque:", item, quantidade);
+                    }
+                } else {
+                    console.error('Erro ao formatar detecção: ', detection);
+                }
+        });
+
+        // Atualizar o estoque no servidor
+        atualizarEstoque();
+
+        // Limpar as detecções no servidor e atualizar a caixa de detecções
+        fetch('/clearDetections', {
+            method: 'POST',
+            headers: {
+                'token': localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+            // Atualizar a exibição da caixa de detecções
+            document.getElementById('detections').innerText = "Sem detecções";
+        })
+        .catch(error => {
+            console.error('Erro ao esvaziar detecções:', error);
+        });
+    }
+
+
+
         function removerItem(index) {
             if (confirm('Deseja remover este item?')) {
                 estoque.splice(index, 1);
@@ -131,7 +191,7 @@
         if (data.detections && data.detections.length > 0) {
             document.getElementById('detections').innerText = data.detections.join('\n');
         } else {
-            document.getElementById('detections').innerText = "Nenhuma detecção encontrada.";
+            document.getElementById('detections').innerText = "Nenhuma detecção foi enviada.";
         }
     })
     .catch(error => {

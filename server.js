@@ -248,6 +248,24 @@ app.post('/esqueci-senha', async (req, res) => {
     }
 });
 
+app.post('/clearDetections', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        // Esvaziar a lista de detecções do usuário
+        user.detections = [];
+        await user.save();
+
+        res.json({ message: 'Detecções esvaziadas com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao esvaziar detecções:', error);
+        res.status(500).json({ error: 'Erro ao esvaziar detecções' });
+    }
+});
+
 app.post('/generateNewKey', authenticateToken, async (req, res) => {
     try {
         const novaChave = crypto.randomBytes(16).toString('hex'); // Gera uma nova chave
