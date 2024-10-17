@@ -163,7 +163,7 @@ function adicionarConstrucaoPorEndereco() {
           );
 
           marker.on("click", function () {
-            abrirEstoque(data); // Abrir o estoque ao clicar no marcador
+            abrirEstoque(data.id); // Abrir o estoque ao clicar no marcador
           });
 
           alert("Nova construção adicionada!");
@@ -192,41 +192,54 @@ function adicionarConstrucaoPorEndereco() {
   });
 }
 
-// Adicionar evento ao botão para ativar a função adicionar construção por endereço
-L.Control.PosicionarConstrucao = L.Control.extend({
+// Função para criar o contêiner de botões (atualizado)
+L.Control.BotaoContainer = L.Control.extend({
   onAdd: function (map) {
-    var btn = L.DomUtil.create("button", "btn-posicionar-construcao");
-    btn.innerHTML = `<img src="assets/map-marker2.png" alt="Posicionar Construção" style="width: 30px; height: 30px;" />`;
-    btn.title = "Posicionar Construção";
-    btn.style.background = "white";
-    btn.style.border = "2px solid #ccc";
-    btn.style.borderRadius = "5px";
-    btn.style.cursor = "pointer";
-    btn.style.padding = "5px";
+    var container = L.DomUtil.create("div", "botao-container");
+    container.style.display = "flex";
+    container.style.flexDirection = "column"; // Botões empilhados na vertical
 
-    L.DomEvent.disableClickPropagation(btn);
+    // Criar o botão de adicionar construção
+    var btnPosicionar = L.DomUtil.create("button", "btn-posicionar-construcao", container);
+    btnPosicionar.innerHTML = `<img src="assets/map-marker2.png" alt="Adicionar Construção" style="width: 25px; height: 25px;" />`;
+    btnPosicionar.title = "Adicionar Construção";
+    btnPosicionar.style.background = "white";
+    btnPosicionar.style.border = "2px solid #ccc";
+    btnPosicionar.style.borderRadius = "5px";
+    btnPosicionar.style.cursor = "pointer";
+    btnPosicionar.style.padding = "5px";
 
-    L.DomEvent.on(btn, "click", function (e) {
+    // Adicionar o evento ao botão de adicionar construção
+    L.DomEvent.on(btnPosicionar, "click", function (e) {
       adicionarConstrucaoPorEndereco();
     });
 
-    return btn;
-  },
+    // Criar o botão de lista de construções logo abaixo
+    var btnListaConstrucoes = L.DomUtil.create("button", "btn-lista-construcoes", container);
+    btnListaConstrucoes.innerHTML = `<img src="assets/lista-construc.png" alt="Lista de Construções" style="width: 25px; height: 25px;" />`;
+    btnListaConstrucoes.title = "Lista de Construções";
+    btnListaConstrucoes.style.background = "white";
+    btnListaConstrucoes.style.border = "2px solid #ccc";
+    btnListaConstrucoes.style.borderRadius = "5px";
+    btnListaConstrucoes.style.cursor = "pointer";
+    btnListaConstrucoes.style.padding = "5px";
 
-  onRemove: function (map) {
-    // Nada a fazer ao remover o botão
-  },
+    // Evento de clique no botão de lista de construções
+    L.DomEvent.on(btnListaConstrucoes, "click", function (e) {
+      abrirModalListaConstrucoes();
+    });
+
+    return container;
+  }
 });
 
-// Adiciona o controle ao mapa, posicionando-o como os botões de zoom
-L.control.posicionarConstrucao = function (opts) {
-  return new L.Control.PosicionarConstrucao(opts);
+// Adicionar o contêiner de botões no canto superior esquerdo
+L.control.botaoContainer = function (opts) {
+  return new L.Control.BotaoContainer(opts);
 };
 
-// Adicionar o botão ao mapa no canto superior esquerdo
-L.control.posicionarConstrucao({ position: "topleft" }).addTo(map);
+L.control.botaoContainer({ position: "topleft" }).addTo(map);
 
-// Função para carregar construções do backend e ajustar o zoom
 // Função para carregar construções do backend e ajustar o zoom
 function carregarConstrucoes() {
   const token = localStorage.getItem('token');
@@ -256,22 +269,22 @@ function carregarConstrucoes() {
           offset: [0, -50], // Posição do tooltip
           opacity: 0.9,
         })
-        .setContent(`<b>${nomeConstrucao}</b><br>Clique para ver o estoque`)
-        .setLatLng(new L.LatLng(lat, lon))
-        .addTo(map); // Adiciona o tooltip diretamente ao mapa
+          .setContent(`<b>${nomeConstrucao}</b><br>Clique para ver o estoque`)
+          .setLatLng(new L.LatLng(lat, lon))
+          .addTo(map); // Adiciona o tooltip diretamente ao mapa
 
         // Evento de clique no tooltip
-        tooltip.on('click', function() {
+        tooltip.on('click', function () {
           abrirEstoque(construcao.id); // Abrir o estoque da construção
         });
 
-        // Também adicionar um marcador, se necessário
+        // Adicionar um marcador
         var marker = L.marker([lat, lon], {
           icon: iconePersonalizado,
         }).addTo(map);
 
         // Evento de clique no marcador também abre o estoque
-        marker.on('click', function() {
+        marker.on('click', function () {
           abrirEstoque(construcao.id); // Abrir o estoque da construção
         });
 
@@ -292,12 +305,58 @@ function abrirEstoque(construcaoId) {
   window.location.href = url;
 }
 
-
 // Chamar a função para carregar as construções ao iniciar
 carregarConstrucoes();
 
-// Função para abrir o estoque da construção em uma nova página
-function abrirEstoque(construcao) {
-  var url = `estoque.html?id=${construcao.id}`;
-  window.location.href = url;
+// Função para abrir o modal de lista de construções
+function abrirModalListaConstrucoes() {
+  // Obter referências aos elementos do modal
+  var modal = document.getElementById("modal-lista-construcoes");
+  var spanFechar = document.getElementById("fechar-modal-lista-construcoes");
+  var listaConstrucoes = document.getElementById("lista-construcoes");
+
+  // Limpar a lista
+  listaConstrucoes.innerHTML = "";
+
+  // Exibir o modal
+  modal.style.display = "block";
+
+  // Obter a lista de construções do backend
+  fetch("/construcoes", {
+    headers: {
+      'token': localStorage.getItem('token')
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      // Preencher a lista com as construções
+      data.forEach(construcao => {
+        var item = document.createElement("li");
+        item.textContent = construcao.nome;
+        item.style.cursor = "pointer";
+        item.style.padding = "10px";
+        item.style.borderBottom = "1px solid #ccc";
+        item.addEventListener("click", function () {
+          // Ao clicar na construção, abrir o estoque
+          abrirEstoque(construcao.id);
+        });
+        listaConstrucoes.appendChild(item);
+      });
+    })
+    .catch(error => {
+      console.error("Erro ao carregar as construções:", error);
+    });
+
+  // Função para fechar o modal
+  function fecharModal() {
+    modal.style.display = "none";
+  }
+
+  // Adicionar event listeners
+  spanFechar.addEventListener("click", fecharModal);
+  window.addEventListener("click", function (event) {
+    if (event.target == modal) {
+      fecharModal();
+    }
+  });
 }
