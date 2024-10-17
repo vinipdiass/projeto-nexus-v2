@@ -9,10 +9,11 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            margin-top: 5px;
         }
 
         h2 {
-            text-align: center;
+            text-align: left;
         }
 
         table {
@@ -36,6 +37,19 @@
             margin-top: 20px;
             padding: 10px 20px;
         }
+
+        .btn-retornar {
+        background-image: url('assets/retornar.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 40px; /* Ajuste conforme necessário */
+        height: 40px; /* Ajuste conforme necessário */
+        border: none; /* Remove a borda */
+        background-color: transparent; /* Remove a cor de fundo */
+        padding: 0; /* Remove o padding */
+        cursor: pointer; /* Mantém o cursor como pointer */
+    }
 
         .btn-remover {
             background-color: red;
@@ -78,6 +92,9 @@
 </head>
 
 <body>
+    
+    <button class="btn-retornar" onclick="window.location.href='programa.html'"></button>
+        
     <h2 id="construcaoNome"></h2>
     <table id="estoqueTable">
         <tr>
@@ -87,8 +104,7 @@
         </tr>
     </table>
     <button onclick="adicionarItem()">Adicionar Item</button>
-    <br>
-    <button onclick="window.location.href='programa.html'">Retornar</button>
+    
 
     <div id="detectionsContainer">
         <h3>Detecções</h3>
@@ -131,7 +147,7 @@
 
                 // Botões para remover e editar a quantidade
                 cellAcao.innerHTML = `
-                <button class="btn-editar" onclick="editarQuantidade(${index})" style="margin-left: 10px;">Editar Quantidade</button>
+                <button onclick="editarQuantidade(${index})" style="margin-left: 10px;">Editar Quantidade</button>
                 <button class="btn-remover" onclick="removerItem(${index})">Remover Item</button>
         `;
             });
