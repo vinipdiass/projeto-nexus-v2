@@ -15,6 +15,24 @@
         <div class="logo-container">
             <img src="assets/logo_nexus.png" alt="Logo da Empresa" class="logo">
             <h1 class="titulo">Projeto Nexus</h1>
+
+            <!-- Modal para adicionar construção -->
+<div id="modal-construcao" class="modal">
+    <div class="modal-content">
+      <span id="fechar-modal-construcao" class="fechar">&times;</span>
+      <h2>Cadastrar Construção</h2>
+  
+      <label for="endereco-input">Endereço:</label>
+      <input type="text" id="endereco-input" name="endereco" placeholder="Digite o endereço" required>
+  
+      <label for="nome-input">Nome da Construção:</label>
+      <input type="text" id="nome-input" name="nome" placeholder="Digite o nome da construção" required>
+  
+      <button id="adicionar-construcao">Adicionar</button>
+      <button id="cancelar-construcao">Cancelar</button>
+    </div>
+  </div>
+  
         </div>
 
         <!-- Perfil movido para a extrema direita -->
@@ -69,5 +87,9 @@
     <!-- Incluindo o arquivo JavaScript externo -->
     <script src="dropdown.js"></script> <!-- Script separado -->
     <script src="app.js"></script> <!-- Script da aplicação do mapa -->
+
+    <!-- Incluindo o script da Google Maps JavaScript API com Places -->
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD--rYlYHovK3dzp8OWd7dXq28G3CCOJto&libraries=places"></script>
+
 </body>
 </html>

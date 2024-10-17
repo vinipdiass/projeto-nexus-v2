@@ -16,6 +16,11 @@ body, html {
     position: relative;
 }
 
+h2{
+  color: black;
+  align-self: center;
+}
+
 /* Estilo para centralizar o logo e o título */
 .logo-container {
     display: flex;

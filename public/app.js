@@ -3,7 +3,6 @@ var adicionarMarcador = false;
 
 // Inicializando o mapa com uma visualização padrão
 var map = L.map("map", {
-  //worldCoypyJump: true permite que o mapa seja copiado e repetido várias vezes
   worldCopyJump: true,
   minZoom: 3,
   maxZoom: 18,
@@ -11,7 +10,7 @@ var map = L.map("map", {
 
 // Ícone do marcador
 var iconePersonalizado = L.icon({
-  iconUrl: "assets/map-marker2.png", // Certifique-se de que o caminho para sua imagem está correto
+  iconUrl: "assets/map-marker2.png",
   iconSize: [50, 50],
   iconAnchor: [23, 50],
   popupAnchor: [0, -38],
@@ -23,297 +22,174 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 document.addEventListener('DOMContentLoaded', () => {
-  const authToken = localStorage.getItem('token'); // Recuperando o token
+  const authToken = localStorage.getItem('token');
   console.log('Token encontrado:', authToken);
 
   if (!authToken) {
-      alert('Token de autenticação não encontrado. Faça login novamente.');
-      window.location.href = '/login.html';
-      return;
+    alert('Token de autenticação não encontrado. Faça login novamente.');
+    window.location.href = '/login.html';
+    return;
   }
 
-
-  // Agora fazemos a requisição para obter a imagem do usuário
+  // Requisição para obter a imagem do usuário
   fetch('/getUserImage', {
-      method: 'GET',
-      headers: {
-          'token': authToken // Usando o token recuperado
-      }
+    method: 'GET',
+    headers: {
+      'token': authToken
+    }
   })
   .then(response => {
-      if (response.ok) {
-          console.log('Imagem encontrada.'); // Verificação adicional
-          return response.blob(); // Obtendo a imagem como um Blob
-      } else {          
-          throw new Error('Erro ao carregar a imagem do usuário.');
-      }
+    if (response.ok) {
+      console.log('Imagem encontrada.');
+      return response.blob();
+    } else {
+      throw new Error('Erro ao carregar a imagem do usuário.');
+    }
   })
   .then(blob => {
-      const imageUrl = URL.createObjectURL(blob);
-      const avatarImg = document.getElementById('userAvatar');
-      avatarImg.src = imageUrl; // Atualizando a imagem do avatar
-      console.log('Imagem carregada com sucesso.');
+    const imageUrl = URL.createObjectURL(blob);
+    const avatarImg = document.getElementById('userAvatar');
+    avatarImg.src = imageUrl;
+    console.log('Imagem carregada com sucesso.');
   })
   .catch(error => {
-      console.error('Erro ao carregar a imagem do usuário:', error);
+    console.error('Erro ao carregar a imagem do usuário:', error);
   });
 });
+
 // Função para alterar o cursor para o ícone do marcador
 function ativarCursorDeMarcador() {
-  // Altera o estilo do cursor do mapa
   map.getContainer().style.cursor = `url('assets/map-cursor.png') 19 0, auto`;
 }
 
 function logout() {
   // Remove o token do localStorage
   localStorage.removeItem('token');
-  
-  // Redireciona para a página de login
   window.location.href = 'index.html';
 }
 
-
 // Função para restaurar o cursor normal
 function desativarCursorDeMarcador() {
-  // Volta o cursor ao estilo padrão
   map.getContainer().style.cursor = "";
 }
 
-// Função para adicionar uma construção com base em um endereço
+// Variáveis globais para o Autocomplete
+var autocomplete;
+var placeSelecionado;
+
 function adicionarConstrucaoPorEndereco() {
   // Obter referências aos elementos do modal
   var modal = document.getElementById("modal-construcao");
   var spanFechar = document.getElementById("fechar-modal-construcao");
   var btnAdicionar = document.getElementById("adicionar-construcao");
   var btnCancelar = document.getElementById("cancelar-construcao");
-  var inputCidade = document.getElementById("cidade-input");
-  var inputBairro = document.getElementById("bairro-input");
-  var inputRua = document.getElementById("rua-input");
-  var inputNumero = document.getElementById("numero-input");
+  var inputEndereco = document.getElementById("endereco-input");
   var inputNome = document.getElementById("nome-input");
 
   // Limpar os campos de entrada
-  inputCidade.value = "";
-  inputBairro.value = "";
-  inputRua.value = "";
-  inputNumero.value = "";
+  inputEndereco.value = "";
   inputNome.value = "";
+  placeSelecionado = null;
 
   // Exibir o modal
   modal.style.display = "block";
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const authToken = localStorage.getItem('token'); // Recuperando o token
-    console.log('Token encontrado:', authToken);
+  // Inicializar o Autocomplete
+  autocomplete = new google.maps.places.Autocomplete(inputEndereco, {
+    types: ['geocode'],
+    componentRestrictions: { country: 'br' } // Restringe ao Brasil
+  });
 
-    if (!authToken) {
-        alert('Token de autenticação não encontrado. Faça login novamente.');
-        window.location.href = '/login.html';
-        return;
-    }
+  // Listener para quando um lugar é selecionado
+  autocomplete.addListener('place_changed', function() {
+    placeSelecionado = autocomplete.getPlace();
+  });
 
-    fetch('/run-camera')
-        .then(response => {
-            if (response.ok) {
-                return response.text();
-            } else {
-                throw new Error('Erro ao chamar o script Python');
-            }
-        })
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-        });
-
-    // Agora fazemos a requisição para obter a imagem do usuário
-    fetch('/getUserImage', {
-        method: 'GET',
-        headers: {
-            'token': authToken // Usando o token recuperado
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Imagem encontrada.'); // Verificação adicional
-            return response.blob(); // Obtendo a imagem como um Blob
-        } else {          
-            throw new Error('Erro ao carregar a imagem do usuário.');
-        }
-    })
-    .then(blob => {
-        const imageUrl = URL.createObjectURL(blob);
-        const avatarImg = document.getElementById('userAvatar');
-        avatarImg.src = imageUrl; // Atualizando a imagem do avatar
-        console.log('Imagem carregada com sucesso.');
-    })
-    .catch(error => {
-        console.error('Erro ao carregar a imagem do usuário:', error);
-    });
-});
-  // Função para fechar o modal
+  // Função para fechar o modal e remover o autocomplete
   function fecharModal() {
     modal.style.display = "none";
-    // Remover event listeners para evitar duplicação
-    btnAdicionar.removeEventListener("click", onAdicionarClick);
-    btnCancelar.removeEventListener("click", onCancelarClick);
-    spanFechar.removeEventListener("click", onFecharClick);
-    window.removeEventListener("click", onWindowClick);
+    google.maps.event.clearInstanceListeners(inputEndereco);
+    autocomplete = null;
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const authToken = localStorage.getItem('token'); // Recuperando o token
-    console.log('Token encontrado:', authToken);
+  // Handler do evento de adicionar construção
+  function onAdicionarClick() {
+    var nomeConstrucao = inputNome.value.trim();
 
-    if (!authToken) {
-        alert('Token de autenticação não encontrado. Faça login novamente.');
-        window.location.href = '/login.html';
-        return;
+    if (!placeSelecionado) {
+      alert("Por favor, selecione um endereço da lista de sugestões.");
+      return;
     }
 
-    fetch('/run-camera')
-        .then(response => {
-            if (response.ok) {
-                return response.text();
-            } else {
-                throw new Error('Erro ao chamar o script Python');
-            }
-        })
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-        });
-
-    // Agora fazemos a requisição para obter a imagem do usuário
-    fetch('/getUserImage', {
-        method: 'GET',
-        headers: {
-            'token': authToken // Usando o token recuperado
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Imagem encontrada.'); // Verificação adicional
-            return response.blob(); // Obtendo a imagem como um Blob
-        } else {          
-            throw new Error('Erro ao carregar a imagem do usuário.');
-        }
-    })
-    .then(blob => {
-        const imageUrl = URL.createObjectURL(blob);
-        const avatarImg = document.getElementById('userAvatar');
-        avatarImg.src = imageUrl; // Atualizando a imagem do avatar
-        console.log('Imagem carregada com sucesso.');
-    })
-    .catch(error => {
-        console.error('Erro ao carregar a imagem do usuário:', error);
-    });
-});
-  // Handlers dos eventos
-  function onAdicionarClick() {
-    var cidade = inputCidade.value.trim();
-    var bairro = inputBairro.value.trim();
-    var rua = inputRua.value.trim();
-    var numero = inputNumero.value.trim();
-    var nomeConstrucao = inputNome.value.trim();
-  
-  
-
-    // Verificar se todos os campos foram preenchidos
-    if (cidade && bairro && rua && numero && nomeConstrucao) {
+    if (nomeConstrucao) {
       // Fechar o modal
       fecharModal();
 
-      // Concatenar os campos em uma única string de endereço
-      var endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
+      var latitude = placeSelecionado.geometry.location.lat();
+      var longitude = placeSelecionado.geometry.location.lng();
 
-      // Fazer a requisição à API Nominatim para obter as coordenadas
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(endereco)}&format=json`)
+      var novaConstrucao = {
+        id: Date.now(),
+        nome: nomeConstrucao,
+        latitude: latitude,
+        longitude: longitude,
+        estoque: [{ item: "Tijolo", quantidade: 100 }],
+      };
+
+      // Enviar a nova construção para o backend
+      fetch("/construcoes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": localStorage.getItem('token'),
+        },
+        body: JSON.stringify(novaConstrucao),
+      })
         .then((response) => response.json())
         .then((data) => {
-          if (data.length > 0) {
-            // Pegando as coordenadas do primeiro resultado
-            var latitude = parseFloat(data[0].lat);
-            var longitude = parseFloat(data[0].lon);
+          // Adicionar a nova construção ao mapa
+          var marker = L.marker([data.latitude, data.longitude], {
+            icon: iconePersonalizado,
+          }).addTo(map);
 
-            var novaConstrucao = {
-              id: Date.now(),
-              nome: nomeConstrucao,
-              latitude: latitude,
-              longitude: longitude,
-              estoque: [{ item: "Tijolo", quantidade: 100 }],
-            };
+          // Mostrar o nome da construção permanentemente com a tooltip
+          marker.bindTooltip(
+            `<b>${data.nome}</b><br>Clique para ver o estoque.`,
+            {
+              permanent: true,
+              direction: "top",
+              className: "custom-tooltip",
+            }
+          );
 
-            // Enviar a nova construção para o backend
-            fetch("/construcoes", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "token": localStorage.getItem('token'),
-              },
-              body: JSON.stringify(novaConstrucao),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                // Adicionar a nova construção ao mapa
-                var marker = L.marker([data.latitude, data.longitude], {
-                  icon: iconePersonalizado,
-                }).addTo(map);
+          marker.on("click", function () {
+            abrirEstoque(data); // Abrir o estoque ao clicar no marcador
+          });
 
-                // Mostrar o nome da construção permanentemente com a tooltip
-                marker.bindTooltip(
-                  `<b>${data.nome}</b><br>Clique para ver o estoque.`,
-                  {
-                    permanent: true,
-                    direction: "top",
-                    className: "custom-tooltip",
-                  }
-                );
+          alert("Nova construção adicionada!");
 
-                marker.on("click", function () {
-                  abrirEstoque(data); // Abrir o estoque ao clicar no marcador
-                });
+          // Imprimir o endereço completo no console
+          console.log("Endereço da construção posicionada:", placeSelecionado.formatted_address);
 
-                alert("Nova construção adicionada!");
-              })
-              .catch((error) =>
-                console.error("Erro ao adicionar a construção:", error)
-              );
-          } else {
-            alert("Endereço não encontrado. Tente novamente.");
-          }
         })
-        .catch((error) => console.error("Erro ao buscar coordenadas:", error));
+        .catch((error) =>
+          console.error("Erro ao adicionar a construção:", error)
+        );
     } else {
-      alert("Por favor, preencha todos os campos.");
-    }
-  }
-
-  function onCancelarClick() {
-    fecharModal();
-  }
-
-  function onFecharClick() {
-    fecharModal();
-  }
-
-  function onWindowClick(event) {
-    if (event.target == modal) {
-      fecharModal();
+      alert("Por favor, preencha o nome da construção.");
     }
   }
 
   // Adicionar event listeners
   btnAdicionar.addEventListener("click", onAdicionarClick);
-  btnCancelar.addEventListener("click", onCancelarClick);
-  spanFechar.addEventListener("click", onFecharClick);
-  window.addEventListener("click", onWindowClick);
+  btnCancelar.addEventListener("click", fecharModal);
+  spanFechar.addEventListener("click", fecharModal);
+  window.addEventListener("click", (event) => {
+    if (event.target == modal) {
+      fecharModal();
+    }
+  });
 }
-
-
 
 // Adicionar evento ao botão para ativar a função adicionar construção por endereço
 L.Control.PosicionarConstrucao = L.Control.extend({
@@ -330,7 +206,7 @@ L.Control.PosicionarConstrucao = L.Control.extend({
     L.DomEvent.disableClickPropagation(btn);
 
     L.DomEvent.on(btn, "click", function (e) {
-      adicionarConstrucaoPorEndereco(); // Chama a função que solicita o endereço e adiciona a construção
+      adicionarConstrucaoPorEndereco();
     });
 
     return btn;
@@ -340,9 +216,6 @@ L.Control.PosicionarConstrucao = L.Control.extend({
     // Nada a fazer ao remover o botão
   },
 });
-
-
-
 
 // Adiciona o controle ao mapa, posicionando-o como os botões de zoom
 L.control.posicionarConstrucao = function (opts) {
@@ -361,7 +234,7 @@ function carregarConstrucoes() {
   }
   fetch("/construcoes", {
     headers: {
-        'token': token
+      'token': token
     }
   })
     .then((response) => response.json())
@@ -376,15 +249,15 @@ function carregarConstrucoes() {
         marker.bindTooltip(
           `<b>${construcao.nome}</b><br>Clique para ver o estoque.`,
           {
-            permanent: true, // A tooltip ficará visível permanentemente
-            direction: "top", // A tooltip aparecerá acima do marcador
-            className: "custom-tooltip", // Adicionando uma classe customizada, se necessário
+            permanent: true,
+            direction: "top",
+            className: "custom-tooltip",
             offset: [0, -60],
           }
         );
 
         marker.on("click", function () {
-          abrirEstoque(construcao); // Abrir o estoque ao clicar no marcador
+          abrirEstoque(construcao);
         });
 
         // Adicionar as coordenadas do marcador ao bounds
@@ -426,7 +299,6 @@ carregarConstrucoes();
 
 // Função para abrir o estoque da construção em uma nova página
 function abrirEstoque(construcao) {
-  // Abrir a página 'estoque.html' passando o ID da construção via query string
   var url = `estoque.html?id=${construcao.id}`;
   window.location.href = url;
 }
@@ -470,7 +342,7 @@ function onMapClick(e) {
           );
 
           marker.on("click", function () {
-            abrirEstoque(data); // Abrir o estoque ao clicar no marcador
+            abrirEstoque(data);
           });
 
           alert("Nova construção adicionada!");
@@ -480,11 +352,11 @@ function onMapClick(e) {
         );
 
       adicionarMarcador = false;
-      desativarCursorDeMarcador(); // Voltar para o cursor padrão
+      desativarCursorDeMarcador();
     } else {
       alert("Construção não adicionada. Nome é obrigatório.");
       adicionarMarcador = false;
-      desativarCursorDeMarcador(); // Voltar para o cursor padrão
+      desativarCursorDeMarcador();
     }
   }
 }
