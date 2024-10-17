@@ -63,16 +63,18 @@ app.post('/deteccoes', async (req, res) => {
             return res.status(400).json({ error: 'Formato de detecções inválido' });
         }
 
-        // Atualiza as detecções do usuário
-        user.detections.push(...detections);
+        // Substitui as detecções do usuário pelas novas
+        user.detections = detections; // Substituir diretamente a lista de detecções
         await user.save();
 
-        res.status(200).json({ message: 'Detecções atualizadas com sucesso!' });
+        res.status(200).json({ message: 'Detecções substituídas com sucesso!' });
     } catch (error) {
-        console.error('Erro ao atualizar detecções:', error);
-        res.status(500).json({ error: 'Erro ao atualizar detecções' });
+        console.error('Erro ao substituir detecções:', error);
+        res.status(500).json({ error: 'Erro ao substituir detecções' });
     }
 });
+
+
 
 const User = mongoose.model('User', userSchema);
 
