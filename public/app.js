@@ -38,23 +38,23 @@ document.addEventListener('DOMContentLoaded', () => {
       'token': authToken
     }
   })
-  .then(response => {
-    if (response.ok) {
-      console.log('Imagem encontrada.');
-      return response.blob();
-    } else {
-      throw new Error('Erro ao carregar a imagem do usuário.');
-    }
-  })
-  .then(blob => {
-    const imageUrl = URL.createObjectURL(blob);
-    const avatarImg = document.getElementById('userAvatar');
-    avatarImg.src = imageUrl;
-    console.log('Imagem carregada com sucesso.');
-  })
-  .catch(error => {
-    console.error('Erro ao carregar a imagem do usuário:', error);
-  });
+    .then(response => {
+      if (response.ok) {
+        console.log('Imagem encontrada.');
+        return response.blob();
+      } else {
+        throw new Error('Erro ao carregar a imagem do usuário.');
+      }
+    })
+    .then(blob => {
+      const imageUrl = URL.createObjectURL(blob);
+      const avatarImg = document.getElementById('userAvatar');
+      avatarImg.src = imageUrl;
+      console.log('Imagem carregada com sucesso.');
+    })
+    .catch(error => {
+      console.error('Erro ao carregar a imagem do usuário:', error);
+    });
 });
 
 // Função para alterar o cursor para o ícone do marcador
@@ -101,7 +101,7 @@ function adicionarConstrucaoPorEndereco() {
   });
 
   // Listener para quando um lugar é selecionado
-  autocomplete.addListener('place_changed', function() {
+  autocomplete.addListener('place_changed', function () {
     placeSelecionado = autocomplete.getPlace();
   });
 
@@ -167,6 +167,7 @@ function adicionarConstrucaoPorEndereco() {
           });
 
           alert("Nova construção adicionada!");
+          window.location.reload();
 
           // Imprimir o endereço completo no console
           console.log("Endereço da construção posicionada:", placeSelecionado.formatted_address);
@@ -226,6 +227,7 @@ L.control.posicionarConstrucao = function (opts) {
 L.control.posicionarConstrucao({ position: "topleft" }).addTo(map);
 
 // Função para carregar construções do backend e ajustar o zoom
+// Função para carregar construções do backend e ajustar o zoom
 function carregarConstrucoes() {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -241,58 +243,55 @@ function carregarConstrucoes() {
     .then((data) => {
       var bounds = new L.LatLngBounds();
       data.forEach((construcao) => {
-        var marker = L.marker([construcao.latitude, construcao.longitude], {
+        var lat = construcao.latitude;
+        var lon = construcao.longitude;
+        var nomeConstrucao = construcao.nome;
+
+        // Criar um tooltip interativo e permanente
+        var tooltip = L.tooltip({
+          direction: 'top',
+          permanent: true,
+          interactive: true, // Isso torna o tooltip clicável
+          noWrap: true,
+          offset: [0, -50], // Posição do tooltip
+          opacity: 0.9,
+        })
+        .setContent(`<b>${nomeConstrucao}</b><br>Clique para ver o estoque`)
+        .setLatLng(new L.LatLng(lat, lon))
+        .addTo(map); // Adiciona o tooltip diretamente ao mapa
+
+        // Evento de clique no tooltip
+        tooltip.on('click', function() {
+          abrirEstoque(construcao.id); // Abrir o estoque da construção
+        });
+
+        // Também adicionar um marcador, se necessário
+        var marker = L.marker([lat, lon], {
           icon: iconePersonalizado,
         }).addTo(map);
 
-        // Usando bindTooltip para mostrar o nome da construção permanentemente
-        marker.bindTooltip(
-          `<b>${construcao.nome}</b><br>Clique para ver o estoque.`,
-          {
-            permanent: true,
-            direction: "top",
-            className: "custom-tooltip",
-            offset: [0, -60],
-          }
-        );
-
-        marker.on("click", function () {
-          abrirEstoque(construcao);
+        // Evento de clique no marcador também abre o estoque
+        marker.on('click', function() {
+          abrirEstoque(construcao.id); // Abrir o estoque da construção
         });
 
         // Adicionar as coordenadas do marcador ao bounds
-        bounds.extend([construcao.latitude, construcao.longitude]);
-
-        // Evento para remover o marcador ao clicar com o botão direito
-        marker.on("contextmenu", function () {
-          if (confirm("Deseja remover esta construção?")) {
-            // Remover do mapa
-            map.removeLayer(marker);
-
-            // Remover do backend
-            fetch(`/construcoes/${construcao.id}`, {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                alert("Construção removida com sucesso.");
-              })
-              .catch((error) =>
-                console.error("Erro ao remover a construção:", error)
-              );
-          }
-        });
+        bounds.extend([lat, lon]);
       });
 
       if (data.length > 0) {
-        map.fitBounds(bounds);
+        map.fitBounds(bounds); // Ajusta o zoom do mapa para caber todas as construções
       }
     })
     .catch((error) => console.error("Erro ao carregar as construções:", error));
 }
+
+// Função para abrir o estoque da construção em uma nova página
+function abrirEstoque(construcaoId) {
+  var url = `estoque.html?id=${construcaoId}`;
+  window.location.href = url;
+}
+
 
 // Chamar a função para carregar as construções ao iniciar
 carregarConstrucoes();
@@ -302,63 +301,3 @@ function abrirEstoque(construcao) {
   var url = `estoque.html?id=${construcao.id}`;
   window.location.href = url;
 }
-
-// Função para adicionar um marcador no mapa ao clicar (apenas se adicionarMarcador for true)
-function onMapClick(e) {
-  if (adicionarMarcador) {
-    var nomeConstrucao = prompt("Digite o nome da construção:");
-    if (nomeConstrucao) {
-      var novaConstrucao = {
-        id: Date.now(),
-        nome: nomeConstrucao,
-        latitude: e.latlng.lat,
-        longitude: e.latlng.lng,
-        estoque: [{ item: "Item Exemplo", quantidade: 100 }],
-      };
-
-      // Enviar a nova construção para o backend
-      fetch("/construcoes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(novaConstrucao),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // Adicionar a nova construção ao mapa
-          var marker = L.marker([data.latitude, data.longitude], {
-            icon: iconePersonalizado,
-          }).addTo(map);
-
-          // Mostrar o nome da construção permanentemente com a tooltip
-          marker.bindTooltip(
-            `<b>${data.nome}</b><br>Clique para ver o estoque.`,
-            {
-              permanent: true,
-              direction: "top",
-              className: "custom-tooltip",
-            }
-          );
-
-          marker.on("click", function () {
-            abrirEstoque(data);
-          });
-
-          alert("Nova construção adicionada!");
-        })
-        .catch((error) =>
-          console.error("Erro ao adicionar a construção:", error)
-        );
-
-      adicionarMarcador = false;
-      desativarCursorDeMarcador();
-    } else {
-      alert("Construção não adicionada. Nome é obrigatório.");
-      adicionarMarcador = false;
-      desativarCursorDeMarcador();
-    }
-  }
-}
-
-map.on("click", onMapClick);
