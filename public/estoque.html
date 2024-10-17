@@ -39,17 +39,17 @@
         }
 
         .btn-retornar {
-        background-image: url('assets/retornar.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 40px; /* Ajuste conforme necessário */
-        height: 40px; /* Ajuste conforme necessário */
-        border: none; /* Remove a borda */
-        background-color: transparent; /* Remove a cor de fundo */
-        padding: 0; /* Remove o padding */
-        cursor: pointer; /* Mantém o cursor como pointer */
-    }
+            background-image: url('assets/retornar.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background-color: transparent;
+            padding: 0;
+            cursor: pointer;
+        }
 
         .btn-remover {
             background-color: red;
@@ -65,16 +65,6 @@
             margin-left: 10px;
         }
 
-        #videoContainer {
-            margin-top: 20px;
-            display: flex;
-            justify-content: left;
-        }
-
-        #videoFeed {
-            border: 2px solid #333;
-        }
-
         #detectionsContainer {
             margin-top: 20px;
             padding: 10px;
@@ -86,15 +76,13 @@
 
         #detections {
             white-space: pre-wrap;
-            /* Preserve quebras de linha */
         }
     </style>
 </head>
 
 <body>
-    
     <button class="btn-retornar" onclick="window.location.href='programa.html'"></button>
-        
+
     <h2 id="construcaoNome"></h2>
     <table id="estoqueTable">
         <tr>
@@ -104,7 +92,7 @@
         </tr>
     </table>
     <button onclick="adicionarItem()">Adicionar Item</button>
-    
+
 
     <div id="detectionsContainer">
         <h3>Detecções</h3>
@@ -112,7 +100,6 @@
     </div>
 
     <button onclick="adicionarDeteccoes()">Adicionar Detecções</button>
-
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -134,18 +121,17 @@
 
         function carregarEstoque() {
             carregarDeteccoes();
-            var table = document.getElementById('estoqueTable');
+            const table = document.getElementById('estoqueTable');
             table.innerHTML = '<tr><th>Item</th><th>Quantidade</th><th>Ação</th></tr>';
             estoque.forEach((item, index) => {
-                var row = table.insertRow();
-                var cellItem = row.insertCell(0);
-                var cellQuantidade = row.insertCell(1);
-                var cellAcao = row.insertCell(2);
+                const row = table.insertRow();
+                const cellItem = row.insertCell(0);
+                const cellQuantidade = row.insertCell(1);
+                const cellAcao = row.insertCell(2);
 
                 cellItem.innerHTML = item.item;
                 cellQuantidade.innerHTML = item.quantidade;
 
-                // Botões para remover e editar a quantidade
                 cellAcao.innerHTML = `
                 <button onclick="editarQuantidade(${index})" style="margin-left: 10px;">Editar Quantidade</button>
                 <button class="btn-remover" onclick="removerItem(${index})">Remover Item</button>
@@ -153,27 +139,32 @@
             });
         }
 
-        function editarQuantidade(index) {
-            var novaQuantidade = prompt('Digite a nova quantidade para o item:');
-            if (novaQuantidade && !isNaN(novaQuantidade)) {
-                estoque[index].quantidade = parseInt(novaQuantidade); // Atualiza a quantidade
-                atualizarEstoque(); // Atualiza o estoque no backend
-            } else {
-                alert('Por favor, insira um número válido para a quantidade.');
-            }
+        // Função para verificar se o item já existe no estoque
+        function verificarItemExistente(item) {
+            return estoque.findIndex(i => i.item.toLowerCase() === item.toLowerCase());
         }
 
-
-
+        // Função para adicionar item manualmente
         function adicionarItem() {
-            var item = prompt('Digite o nome do item:');
-            var quantidade = prompt('Digite a quantidade:');
-            if (item && quantidade) {
-                estoque.push({ item: item, quantidade: quantidade });
+            const item = prompt('Digite o nome do item:');
+            const quantidade = prompt('Digite a quantidade:');
+
+            if (item && quantidade && !isNaN(quantidade)) {
+                const itemIndex = verificarItemExistente(item);
+                if (itemIndex > -1) {
+                    // Atualiza a quantidade do item existente
+                    estoque[itemIndex].quantidade = parseInt(quantidade);
+                } else {
+                    // Adiciona um novo item
+                    estoque.push({ item: item, quantidade: parseInt(quantidade) });
+                }
                 atualizarEstoque();
+            } else {
+                alert('Por favor, insira um nome de item e uma quantidade válida.');
             }
         }
 
+        // Função para adicionar detecções automaticamente
         function adicionarDeteccoes() {
             console.log("Função adicionarDeteccoes chamada");
 
@@ -183,35 +174,36 @@
             const detectionsArray = detectionsText.split('\n').filter(item => item.trim() !== '');
 
             if (detectionsArray.length === 0) {
-                alert("Detecções enviadas.");
+                alert("Nenhuma detecção encontrada.");
                 return;
             }
 
-            // Regex para detectar a quantidade e o nome do item no formato "<quantidade> <item>(s)"
             const regex = /^(\d+)\s+(.+)\(s\)$/;
 
             detectionsArray.forEach(detection => {
                 const match = detection.match(regex);
-                console.log("Processando detecção:", detection);
-
                 if (match) {
-                    const quantidade = parseInt(match[1]); // Quantidade
-                    const item = match[2].trim(); // Nome do item
+                    const quantidade = parseInt(match[1]);
+                    const item = match[2].trim();
 
                     if (item && quantidade) {
-                        // Adicionar o item ao estoque
-                        estoque.push({ item: item, quantidade: quantidade });
-                        console.log("Adicionado ao estoque:", item, quantidade);
+                        const itemIndex = verificarItemExistente(item);
+                        if (itemIndex > -1) {
+                            // Atualiza a quantidade do item existente
+                            estoque[itemIndex].quantidade = quantidade;
+                        } else {
+                            // Adiciona um novo item
+                            estoque.push({ item: item, quantidade: quantidade });
+                        }
                     }
                 } else {
                     console.error('Erro ao formatar detecção: ', detection);
                 }
             });
 
-            // Atualizar o estoque no servidor
             atualizarEstoque();
 
-            // Limpar as detecções no servidor e atualizar a caixa de detecções
+            // Limpar as detecções no servidor
             fetch('/clearDetections', {
                 method: 'POST',
                 headers: {
@@ -222,8 +214,8 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data.message);
-                    // Atualizar a exibição da caixa de detecções
                     document.getElementById('detections').innerText = "Sem detecções";
+                    carregarDeteccoes();  // Recarregar as detecções após limpar o servidor
                 })
                 .catch(error => {
                     console.error('Erro ao esvaziar detecções:', error);
@@ -231,6 +223,15 @@
         }
 
 
+        function editarQuantidade(index) {
+            const novaQuantidade = prompt('Digite a nova quantidade para o item:');
+            if (novaQuantidade && !isNaN(novaQuantidade)) {
+                estoque[index].quantidade = parseInt(novaQuantidade);
+                atualizarEstoque();
+            } else {
+                alert('Por favor, insira um número válido para a quantidade.');
+            }
+        }
 
         function removerItem(index) {
             if (confirm('Deseja remover este item?')) {
@@ -240,7 +241,6 @@
         }
 
         function atualizarEstoque() {
-            // Atualizar o estoque no backend
             fetch('/construcoes/' + construcaoId + '/estoque', {
                 method: 'PUT',
                 headers: {
