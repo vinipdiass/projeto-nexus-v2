@@ -1,19 +1,66 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <link rel="icon" href="assets/estoque.png">
     <meta charset="UTF-8">
     <title>Estoque da Construção</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        button { margin-top: 20px; padding: 10px 20px; }
-        .btn-remover { background-color: red; color: white; cursor: pointer; margin-left: 10px; }
-        #videoContainer { margin-top: 20px; display: flex; justify-content: left;}
-        #videoFeed { border: 2px solid #333; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+        }
+
+        .btn-remover {
+            background-color: red;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .btn-editar {
+            background-color: rgb(255, 149, 0);
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #videoContainer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: left;
+        }
+
+        #videoFeed {
+            border: 2px solid #333;
+        }
+
         #detectionsContainer {
             margin-top: 20px;
             padding: 10px;
@@ -22,11 +69,14 @@
             background-color: #f9f9f9;
             width: 250px;
         }
+
         #detections {
-            white-space: pre-wrap; /* Preserve quebras de linha */
+            white-space: pre-wrap;
+            /* Preserve quebras de linha */
         }
     </style>
 </head>
+
 <body>
     <h2 id="construcaoNome"></h2>
     <table id="estoqueTable">
@@ -46,7 +96,7 @@
     </div>
 
     <button onclick="adicionarDeteccoes()">Adicionar Detecções</button>
-    
+
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -75,11 +125,29 @@
                 var cellItem = row.insertCell(0);
                 var cellQuantidade = row.insertCell(1);
                 var cellAcao = row.insertCell(2);
+
                 cellItem.innerHTML = item.item;
                 cellQuantidade.innerHTML = item.quantidade;
-                cellAcao.innerHTML = '<button class="btn-remover" onclick="removerItem(' + index + ')">Remover Item</button>';
+
+                // Botões para remover e editar a quantidade
+                cellAcao.innerHTML = `
+                <button class="btn-editar" onclick="editarQuantidade(${index})" style="margin-left: 10px;">Editar Quantidade</button>
+                <button class="btn-remover" onclick="removerItem(${index})">Remover Item</button>
+        `;
             });
         }
+
+        function editarQuantidade(index) {
+            var novaQuantidade = prompt('Digite a nova quantidade para o item:');
+            if (novaQuantidade && !isNaN(novaQuantidade)) {
+                estoque[index].quantidade = parseInt(novaQuantidade); // Atualiza a quantidade
+                atualizarEstoque(); // Atualiza o estoque no backend
+            } else {
+                alert('Por favor, insira um número válido para a quantidade.');
+            }
+        }
+
+
 
         function adicionarItem() {
             var item = prompt('Digite o nome do item:');
@@ -95,7 +163,7 @@
 
             const detectionsText = document.getElementById('detections').innerText;
             console.log("Detecções encontradas:", detectionsText);
-            
+
             const detectionsArray = detectionsText.split('\n').filter(item => item.trim() !== '');
 
             if (detectionsArray.length === 0) {
@@ -122,29 +190,29 @@
                 } else {
                     console.error('Erro ao formatar detecção: ', detection);
                 }
-        });
+            });
 
-        // Atualizar o estoque no servidor
-        atualizarEstoque();
+            // Atualizar o estoque no servidor
+            atualizarEstoque();
 
-        // Limpar as detecções no servidor e atualizar a caixa de detecções
-        fetch('/clearDetections', {
-            method: 'POST',
-            headers: {
-                'token': localStorage.getItem('token'),
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data.message);
-            // Atualizar a exibição da caixa de detecções
-            document.getElementById('detections').innerText = "Sem detecções";
-        })
-        .catch(error => {
-            console.error('Erro ao esvaziar detecções:', error);
-        });
-    }
+            // Limpar as detecções no servidor e atualizar a caixa de detecções
+            fetch('/clearDetections', {
+                method: 'POST',
+                headers: {
+                    'token': localStorage.getItem('token'),
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    // Atualizar a exibição da caixa de detecções
+                    document.getElementById('detections').innerText = "Sem detecções";
+                })
+                .catch(error => {
+                    console.error('Erro ao esvaziar detecções:', error);
+                });
+        }
 
 
 
@@ -164,43 +232,44 @@
                 },
                 body: JSON.stringify(estoque)
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Estoque atualizado:', data);
-                carregarEstoque();
-            })
-            .catch(error => console.error('Erro ao atualizar o estoque:', error));
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Estoque atualizado:', data);
+                    carregarEstoque();
+                })
+                .catch(error => console.error('Erro ao atualizar o estoque:', error));
         }
 
         function carregarDeteccoes() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        alert('Você precisa estar logado para ver as detecções.');
-        window.location.href = '/login.html';
-        return;
-    }
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Você precisa estar logado para ver as detecções.');
+                window.location.href = '/login.html';
+                return;
+            }
 
-    fetch('/getUserDetections', {
-        method: 'GET',
-        headers: {
-            'token': token
+            fetch('/getUserDetections', {
+                method: 'GET',
+                headers: {
+                    'token': token
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.detections && data.detections.length > 0) {
+                        document.getElementById('detections').innerText = data.detections.join('\n');
+                    } else {
+                        document.getElementById('detections').innerText = "Nenhuma detecção foi enviada.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar detecções:', error);
+                    document.getElementById('detections').innerText = "Erro ao carregar detecções.";
+                });
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.detections && data.detections.length > 0) {
-            document.getElementById('detections').innerText = data.detections.join('\n');
-        } else {
-            document.getElementById('detections').innerText = "Nenhuma detecção foi enviada.";
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao carregar detecções:', error);
-        document.getElementById('detections').innerText = "Erro ao carregar detecções.";
-    });
-}
 
         carregarConstrucao();
     </script>
 </body>
+
 </html>
